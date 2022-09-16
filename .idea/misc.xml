@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/workspace/NetCore/RxHttp/src/main/res/drawable/solid_lightblack_round.xml" value="0.148" />
+        <entry key="..\:/workspace/NetCore/RxHttp/src/main/res/layout/layout_dialog_app_loading.xml" value="0.3536458333333333" />
+        <entry key="..\:/workspace/NetCore/app/src/main/res/layout/activity_main.xml" value="0.3536458333333333" />
+        <entry key="..\:/workspace/NetCore/app/src/main/res/layout/layout_my_loading.xml" value="0.21979166666666666" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

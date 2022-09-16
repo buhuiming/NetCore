@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">RxJava</string>
+    <string name="string_loading">正在请求…</string>
+</resources>

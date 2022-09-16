@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <paths>
+        <!--代表的根目录为： Context.getFilesDir() -->
+        <files-path
+            name="files"
+            path="." />
+        <external-path
+            name="external_storage_root"
+            path="."/>
+        <external-path
+            name="cstscrm"
+            path="." />
+        <root-path
+            name="root"
+            path="." />
+        <cache-path
+            name="cache"
+            path="/"/>
+        <external-path
+            name="external"
+            path="." />
+        <external-cache-path
+            name="external_cache"
+            path="." />
+        <external-files-path
+            name="external_file"
+            path="." />
+        <external-files-path
+            name="sharedata"
+            path="shareData/"/>
+    </paths>
+</resources>
