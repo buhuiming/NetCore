@@ -11,7 +11,7 @@ import com.bhm.rxhttp.rxjava.callback.CallBack
 import com.bhm.rxhttp.rxjava.callback.RxStreamCallBackImp
 import com.bhm.rxhttp.utils.ResultException
 import com.bhm.rxhttp.utils.RxLoadingDialog
-import com.bhm.rxhttp.utils.RxUtils.logger
+import com.bhm.rxhttp.utils.RxUtil.logger
 import com.trello.rxlifecycle4.components.support.RxAppCompatActivity
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable

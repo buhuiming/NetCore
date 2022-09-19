@@ -2,7 +2,7 @@ package com.bhm.rxhttp.rxjava
 
 import android.annotation.SuppressLint
 import com.bhm.rxhttp.rxjava.callback.RxUpLoadCallBack
-import com.bhm.rxhttp.utils.RxUtils
+import com.bhm.rxhttp.utils.RxUtil
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MediaType
@@ -56,7 +56,7 @@ class UpLoadRequestBody(private val mRequestBody: RequestBody, private val rxBui
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
                             (rxBuilder.listener as RxUpLoadCallBack).onStart()
-                            RxUtils.logger(rxBuilder, "upLoad-- > ", "begin upLoad")
+                            RxUtil.logger(rxBuilder, "upLoad-- > ", "begin upLoad")
                         }
                 }
                 bytesWritten += byteCount

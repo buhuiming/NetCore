@@ -11,7 +11,7 @@ import java.io.InputStream
 /**
  * Created by bhm on 2022/9/15.
  */
-object RxUtils {
+object RxUtil {
     /**
      * 将输入流写入文件
      *

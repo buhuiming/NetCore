@@ -2,7 +2,7 @@ package com.bhm.rxhttp.rxjava.interceptor
 
 import android.util.Log
 import com.bhm.rxhttp.rxjava.RxBuilder
-import com.bhm.rxhttp.utils.RxUtils.logger
+import com.bhm.rxhttp.utils.RxUtil.logger
 import okhttp3.logging.HttpLoggingInterceptor
 import java.net.URLDecoder
 import java.util.regex.Pattern

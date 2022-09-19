@@ -3,7 +3,7 @@ package com.bhm.rxhttp.rxjava
 import okhttp3.ResponseBody
 import android.annotation.SuppressLint
 import com.bhm.rxhttp.rxjava.callback.RxDownLoadCallBack
-import com.bhm.rxhttp.utils.RxUtils
+import com.bhm.rxhttp.utils.RxUtil
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MediaType
@@ -47,12 +47,12 @@ class DownLoadResponseBody(
                 if (rxBuilder?.listener != null &&
                     rxBuilder.listener is RxDownLoadCallBack) {
                     if (totalBytesRead == 0L && bytesRead != -1L) {
-                        RxUtils.deleteFile(rxBuilder, totalBytes)
+                        RxUtil.deleteFile(rxBuilder, totalBytes)
                         Observable.just(bytesRead)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
                                 (rxBuilder.listener as RxDownLoadCallBack).onStart()
-                                RxUtils.logger(rxBuilder, "DownLoad-- > ", "begin downLoad")
+                                RxUtil.logger(rxBuilder, "DownLoad-- > ", "begin downLoad")
                             }
                     }
                     totalBytesRead += if (bytesRead != -1L) bytesRead else 0
@@ -73,14 +73,14 @@ class DownLoadResponseBody(
                                 .subscribe {
                                     (rxBuilder.listener as RxDownLoadCallBack).onProgress(100, bytesRead, totalBytes)
                                     (rxBuilder.listener as RxDownLoadCallBack).onFinish()
-                                    RxUtils.logger(rxBuilder, "DownLoad-- > ", "finish downLoad")
+                                    RxUtil.logger(rxBuilder, "DownLoad-- > ", "finish downLoad")
                                     if (null != rxBuilder.dialog && rxBuilder.isShowDialog) {
                                         rxBuilder.dialog?.dismissLoading(rxBuilder.activity)
                                     }
                                 }
                         }
                     }
-                    RxUtils.writeFile(sink.inputStream(), rxBuilder)
+                    RxUtil.writeFile(sink.inputStream(), rxBuilder)
                 }
                 return bytesRead
             }
