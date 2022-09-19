@@ -155,7 +155,6 @@ open class MainActivity : RxBaseActivity() {
         /*默认使用Application的配置*/
         val builder = newBuilder(this)
             .setLoadingDialog(defaultDialog)
-            .setRxManager(rxManager)
             .bindRx()
         val observable = builder
             .createApi(HttpApi::class.java, "http://news-at.zhihu.com")
@@ -171,7 +170,6 @@ open class MainActivity : RxBaseActivity() {
                 val builder1 = newBuilder(this@MainActivity)
                     .setLoadingDialog(defaultDialog)
                     .setLoadingTitle("dsadasd")
-                    .setRxManager(rxManager)
                     .bindRx()
                 val observable1 = builder1
                     .createApi(HttpApi::class.java, "http://news-at.zhihu.com")
@@ -195,7 +193,7 @@ open class MainActivity : RxBaseActivity() {
                 dialogDismissInterruptRequest = false
             ) //.setHttpTimeOut()
             .setIsLogOutPut(true)
-            .setIsDefaultToast(false, rxManager)
+            .setIsDefaultToast(false)
             .bindRx()
         val observable = builder
             .createApi(HttpApi::class.java, "https://www.pgyer.com/")
@@ -227,7 +225,7 @@ open class MainActivity : RxBaseActivity() {
                 dialogDismissInterruptRequest = false
             )
             .setIsLogOutPut(true) //默认是false
-            .setIsDefaultToast(true, rxManager)
+            .setIsDefaultToast(true)
             .bindRx()
         val observable = builder
             .createApi(
@@ -284,13 +282,12 @@ open class MainActivity : RxBaseActivity() {
             )
             .setDownLoadFileAtr(filePath, fileName, true, downLoadLength)
             .setIsLogOutPut(true)
-            .setIsDefaultToast(true, rxManager)
+            .setIsDefaultToast(true)
             .bindRx()
         val observable = builder //域名随便填写,但必须以“/”为结尾
             .createApi(HttpApi::class.java, "http://s.downpp.com/", rxDownLoadListener)
             .downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
         down_Disposable = builder.beginDownLoad(observable)
-        rxManager.subscribe(down_Disposable!!)
     }
 
     private val rxUpLoadListener: RxUpLoadCallBack = object : RxUpLoadCallBack() {

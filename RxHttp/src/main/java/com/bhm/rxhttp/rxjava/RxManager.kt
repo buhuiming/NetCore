@@ -9,7 +9,7 @@ import java.util.ArrayList
 
 /**
  * Created by bhm on 2022/9/15.
- * 用于管理Rxjava 注册订阅和取消订阅
+ * 用于管理每个请求
  */
 class RxManager {
 

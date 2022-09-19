@@ -2,7 +2,6 @@ package com.bhm.rxhttp.rxjava
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import com.google.gson.JsonSyntaxException
 import com.bhm.rxhttp.rxjava.RxConfig.Companion.cancelable
 import com.bhm.rxhttp.rxjava.RxConfig.Companion.rxLoadingDialog
 import com.bhm.rxhttp.rxjava.RxConfig.Companion.writtenLength
@@ -12,7 +11,7 @@ import com.bhm.rxhttp.rxjava.callback.RxStreamCallBackImp
 import com.bhm.rxhttp.utils.ResultException
 import com.bhm.rxhttp.utils.RxLoadingDialog
 import com.bhm.rxhttp.utils.RxUtil.logger
-import com.trello.rxlifecycle4.components.support.RxAppCompatActivity
+import com.google.gson.JsonSyntaxException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -35,7 +34,7 @@ class RxBuilder(private val builder: Builder) {
     var listener: RxStreamCallBackImp? = null
         private set
     private var currentRequestDateTamp: Long = 0
-    val activity: RxAppCompatActivity
+    val activity: RxBaseActivity
         get() = builder.activity
     val isShowDialog: Boolean
         get() = builder.isShowDialog
@@ -113,9 +112,7 @@ class RxBuilder(private val builder: Builder) {
         currentRequestDateTamp = System.currentTimeMillis()
         //做准备工作
         callBack?.onStart(disposable)
-        if (builder.rxManager != null) {
-            builder.rxManager!!.subscribe(disposable)
-        }
+        builder.rxManager?.subscribe(disposable)
         return disposable
     }
 
@@ -196,7 +193,7 @@ class RxBuilder(private val builder: Builder) {
         get() = CompositeDisposable()
 
     fun beginDownLoad(observable: Observable<ResponseBody>): Disposable {
-        return observable.subscribeOn(Schedulers.io())
+        val disposable = observable.subscribeOn(Schedulers.io())
             .unsubscribeOn(Schedulers.io())
             .map { responseBody -> responseBody.byteStream() }
             .observeOn(AndroidSchedulers.mainThread())
@@ -207,14 +204,14 @@ class RxBuilder(private val builder: Builder) {
                         builder.dialog!!.dismissLoading(builder.activity)
                     }
                 }
-                if (builder.rxManager != null) {
-                    builder.rxManager!!.removeObserver()
-                }
+                builder.rxManager?.removeObserver()
             }
+        builder.rxManager?.subscribe(disposable)
+        return disposable
     }
 
-    class Builder(val activity: RxAppCompatActivity) {
-        internal var rxManager: RxManager? = null
+    class Builder(val activity: RxBaseActivity) {
+        internal var rxManager: RxManager? = activity.rxManager
         internal var isShowDialog = RxConfig.isShowDialog
         internal var isCancelable = cancelable()
         internal var dialog = rxLoadingDialog
@@ -248,14 +245,8 @@ class RxBuilder(private val builder: Builder) {
             return this
         }
 
-        fun setIsDefaultToast(isDefaultToast: Boolean, rxManager: RxManager?): Builder {
+        fun setIsDefaultToast(isDefaultToast: Boolean): Builder {
             this.isDefaultToast = isDefaultToast
-            this.rxManager = rxManager
-            return this
-        }
-
-        fun setRxManager(rxManager: RxManager?): Builder {
-            this.rxManager = rxManager
             return this
         }
 
@@ -315,7 +306,7 @@ class RxBuilder(private val builder: Builder) {
 
     companion object {
         @JvmStatic
-        fun newBuilder(activity: RxAppCompatActivity): Builder {
+        fun newBuilder(activity: RxBaseActivity): Builder {
             return Builder(activity)
         }
     }
