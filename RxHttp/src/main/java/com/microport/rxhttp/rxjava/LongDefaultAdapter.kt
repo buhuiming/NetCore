@@ -1,4 +1,4 @@
-package com.microport.rxhttp.rxjava.callback
+package com.microport.rxhttp.rxjava
 
 import com.google.gson.*
 import java.lang.reflect.Type
