@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import com.bhm.netcore.R
-import com.bhm.rxhttp.rxjava.RxBuilder
-import com.bhm.rxhttp.utils.RxLoadingFragment
+import com.bhm.rxhttp.core.RxBuilder
+import com.bhm.rxhttp.base.RxLoadingFragment
 
 class MyRxLoadingFragment internal constructor(private val rxBuilder: RxBuilder) :
     RxLoadingFragment(

@@ -1,8 +1,8 @@
 package com.bhm.sdk.demo.tools
 
-import com.bhm.rxhttp.rxjava.RxBuilder
-import com.bhm.rxhttp.utils.RxLoadingDialog
-import com.bhm.rxhttp.utils.RxLoadingFragment
+import com.bhm.rxhttp.core.RxBuilder
+import com.bhm.rxhttp.base.RxLoadingDialog
+import com.bhm.rxhttp.base.RxLoadingFragment
 
 /**
  * Created by bhm on 2022/9/15.

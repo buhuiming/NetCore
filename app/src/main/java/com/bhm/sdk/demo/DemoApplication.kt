@@ -2,7 +2,7 @@ package com.bhm.sdk.demo
 
 import android.app.Application
 import com.bhm.sdk.demo.tools.MyLoadingDialog
-import com.bhm.rxhttp.rxjava.RxConfig
+import com.bhm.rxhttp.core.RxConfig
 
 /**
  * Created by bhm on 2022/9/15.

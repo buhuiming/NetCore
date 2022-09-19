@@ -1,5 +1,9 @@
 # NetCore
 
+### 用法
+
+#### 1、Activity继承RxBaseActivity，Fragment继承RxBaseFragment，DialogFragment继承RxBaseDialogFragment
+
 ### TO DO
 
 #### 1、优化上传文件、下载文件于callBack的回调
