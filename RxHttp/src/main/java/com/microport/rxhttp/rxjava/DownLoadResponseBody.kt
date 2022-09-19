@@ -44,14 +44,14 @@ class DownLoadResponseBody(
             override fun read(sink: Buffer, byteCount: Long): Long {
                 val bytesRead = super.read(sink, byteCount)
                 // read() returns the number of bytes read, or -1 if this source is exhausted.
-                if (null != rxBuilder && null != rxBuilder.listener &&
+                if (rxBuilder?.listener != null &&
                     rxBuilder.listener is RxDownLoadCallBack) {
                     if (totalBytesRead == 0L && bytesRead != -1L) {
                         RxUtils.deleteFile(rxBuilder, totalBytes)
                         Observable.just(bytesRead)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
-                                rxBuilder.listener.onStart()
+                                (rxBuilder.listener as RxDownLoadCallBack).onStart()
                                 RxUtils.logger(rxBuilder, "DownLoad-- > ", "begin downLoad")
                             }
                     }
@@ -61,7 +61,7 @@ class DownLoadResponseBody(
                         Observable.just(bytesRead)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
-                                rxBuilder.listener.onProgress(
+                                (rxBuilder.listener as RxDownLoadCallBack).onProgress(
                                     if (progress > 100) 100 else progress,
                                     bytesRead,
                                     totalBytes
@@ -71,11 +71,11 @@ class DownLoadResponseBody(
                             Observable.just(bytesRead)
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe {
-                                    rxBuilder.listener.onProgress(100, bytesRead, totalBytes)
-                                    rxBuilder.listener.onFinish()
+                                    (rxBuilder.listener as RxDownLoadCallBack).onProgress(100, bytesRead, totalBytes)
+                                    (rxBuilder.listener as RxDownLoadCallBack).onFinish()
                                     RxUtils.logger(rxBuilder, "DownLoad-- > ", "finish downLoad")
                                     if (null != rxBuilder.dialog && rxBuilder.isShowDialog) {
-                                        rxBuilder.dialog.dismissLoading(rxBuilder.activity)
+                                        rxBuilder.dialog?.dismissLoading(rxBuilder.activity)
                                     }
                                 }
                         }

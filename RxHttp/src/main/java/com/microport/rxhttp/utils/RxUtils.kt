@@ -59,11 +59,11 @@ object RxUtils {
         if (TextUtils.isEmpty(rxBuilder.filePath) || TextUtils.isEmpty(rxBuilder.fileName)) {
             throw IOException("filePath or fileName is null!")
         }
-        val fileDir = File(rxBuilder.filePath)
+        val fileDir = File(rxBuilder.filePath!!)
         if (!fileDir.exists()) {
             fileDir.mkdirs()
         }
-        val file: File = if (rxBuilder.filePath.endsWith("/")) {
+        val file: File = if (rxBuilder.filePath!!.endsWith("/")) {
             File(rxBuilder.filePath + rxBuilder.fileName)
         } else {
             File(rxBuilder.filePath + "/" + rxBuilder.fileName)

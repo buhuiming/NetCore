@@ -13,8 +13,8 @@ class HeaderInterceptor {
         return Interceptor { chain: Interceptor.Chain ->
             val requestBuilder: okhttp3.Request.Builder = chain.request()
                 .newBuilder()
-            if (builder.defaultHeader != null && !builder.defaultHeader.isEmpty()) {
-                for (stringStringEntry in builder.defaultHeader.entries) {
+            builder.defaultHeader?.let {
+                for (stringStringEntry in it.entries) {
                     val key = (stringStringEntry as Map.Entry<*, *>).key.toString()
                     val value = (stringStringEntry as Map.Entry<*, *>).value.toString()
                     requestBuilder.addHeader(key, value)

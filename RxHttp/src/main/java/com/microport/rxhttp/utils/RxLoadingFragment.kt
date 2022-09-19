@@ -73,8 +73,8 @@ open class RxLoadingFragment(private val builder: RxBuilder) : DialogFragment() 
                     && keyEvent.action == KeyEvent.ACTION_UP
                 ) {
                     if (builder.isCancelable) {
-                        if (builder.isDialogDismissInterruptRequest && null != builder.rxManager) {
-                            builder.rxManager.removeObserver()
+                        if (builder.isDialogDismissInterruptRequest) {
+                            builder.rxManager?.removeObserver()
                         }
                         dismiss()
                         return@OnKeyListener true
@@ -82,9 +82,7 @@ open class RxLoadingFragment(private val builder: RxBuilder) : DialogFragment() 
                     if (System.currentTimeMillis() - onBackPressed > 1000) {
                         onBackPressed = System.currentTimeMillis()
                     } else {
-                        if (null != builder.rxManager) {
-                            builder.rxManager.removeObserver()
-                        }
+                        builder.rxManager?.removeObserver()
                         dismiss()
                     }
                 }

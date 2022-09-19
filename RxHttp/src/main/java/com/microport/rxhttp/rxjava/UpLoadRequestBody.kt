@@ -45,7 +45,7 @@ class UpLoadRequestBody(private val mRequestBody: RequestBody, private val rxBui
         @Throws(IOException::class)
         override fun write(source: Buffer, byteCount: Long) {
             super.write(source, byteCount)
-            if (null != rxBuilder && null != rxBuilder.listener &&
+            if (rxBuilder?.listener != null &&
                 rxBuilder.listener is RxUpLoadCallBack
             ) {
                 if (contentLength == 0L) {
@@ -55,7 +55,7 @@ class UpLoadRequestBody(private val mRequestBody: RequestBody, private val rxBui
                     Observable.just(bytesWritten)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
-                            rxBuilder.listener.onStart()
+                            (rxBuilder.listener as RxUpLoadCallBack).onStart()
                             RxUtils.logger(rxBuilder, "upLoad-- > ", "begin upLoad")
                         }
                 }
@@ -64,7 +64,7 @@ class UpLoadRequestBody(private val mRequestBody: RequestBody, private val rxBui
                 Observable.just(bytesWritten)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        rxBuilder.listener.onProgress(
+                        (rxBuilder.listener as RxUpLoadCallBack).onProgress(
                             if (progress > 100) 100 else progress,
                             byteCount,
                             contentLength

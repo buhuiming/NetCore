@@ -17,7 +17,7 @@ open class RxLoadingDialog {
      * isCancelable true,单击返回键，dialog关闭；false,1s内双击返回键，dialog关闭，否则dialog不关闭
      */
     fun showLoading(builder: RxBuilder) {
-        if (builder.activity != null && !builder.activity.isFinishing && builder.isShowDialog) {
+        if (!builder.activity.isFinishing && builder.isShowDialog) {
             if (rxLoadingFragment == null) {
                 rxLoadingFragment = initDialog(builder)
             }

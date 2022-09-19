@@ -21,7 +21,7 @@ class GenerateOkHttpClient {
 
     fun make(builder: RxBuilder): OkHttpClient {
         if (null != builder.okHttpClient) {
-            return builder.okHttpClient
+            return builder.okHttpClient!!
         }
         if (builder.readTimeOut > 0) {
             timeOutRead = builder.readTimeOut
