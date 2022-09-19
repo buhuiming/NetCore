@@ -36,8 +36,7 @@ import retrofit2.HttpException;
 
 public class RxBuilder {
 
-    private Builder builder;
-    private CallBack callBack;
+    private final Builder builder;
     private RxStreamCallBackImp listener;
     private long currentRequestDateTamp = 0;
 
@@ -55,10 +54,6 @@ public class RxBuilder {
 
     public boolean isCancelable() {
         return builder.cancelable;
-    }
-
-    public CallBack getCallBack() {
-        return callBack;
     }
 
     public boolean isLogOutPut() {
@@ -152,17 +147,16 @@ public class RxBuilder {
     }
 
     public <T> Disposable setCallBack(Observable<T> observable, final CallBack<T> callBack){
-        this.callBack = callBack;
         Disposable disposable = observable.compose(builder.activity.bindToLifecycle())//管理生命周期
                 .compose(RxManager.rxSchedulerHelper())//发布事件io线程
-                .subscribe(getBaseConsumer(),
-                        getThrowableConsumer(),
-                        getDefaultAction(),
+                .subscribe(getBaseConsumer(callBack),
+                        getThrowableConsumer(callBack),
+                        getDefaultAction(callBack),
                         getDisposableContainer());
         currentRequestDateTamp = System.currentTimeMillis();
         //做准备工作
-        if(null != getCallBack()){
-            getCallBack().onStart(disposable);
+        if(null != callBack){
+            callBack.onStart(disposable);
         }
         if(builder.rxManager != null){
             builder.rxManager.subscribe(disposable);
@@ -171,7 +165,7 @@ public class RxBuilder {
     }
 
     @SuppressLint("CheckResult")
-    private <T> Consumer<T> getBaseConsumer(){
+    private <T> Consumer<T> getBaseConsumer(final CallBack<T> callBack){
         return new Consumer<T>(){
             @Override
             public void accept(T t) throws Exception {
@@ -181,19 +175,19 @@ public class RxBuilder {
                             .subscribe(new Consumer<Long>() {
                                 @Override
                                 public void accept(Long aLong) throws Exception {
-                                    doBaseConsumer(t);
+                                    doBaseConsumer(callBack, t);
                                 }
                             });
                 }else {
-                    doBaseConsumer(t);
+                    doBaseConsumer(callBack, t);
                 }
             }
         };
     }
 
-    private <T> void doBaseConsumer(T t){
-        if (null != getCallBack()) {
-            getCallBack().onSuccess(t);
+    private <T> void doBaseConsumer(final CallBack<T> callBack, T t){
+        if (null != callBack) {
+            callBack.onSuccess(t);
         }
         if (isShowDialog() && null != getDialog()) {
             getDialog().dismissLoading(getActivity());
@@ -201,7 +195,7 @@ public class RxBuilder {
     }
 
     @SuppressLint("CheckResult")
-    private Consumer<Throwable> getThrowableConsumer(){
+    private <T> Consumer<Throwable> getThrowableConsumer(final CallBack<T> callBack){
         return new Consumer<Throwable>() {
             @Override
             public void accept(Throwable e) throws Exception {
@@ -215,19 +209,19 @@ public class RxBuilder {
                             .subscribe(new Consumer<Long>() {
                                 @Override
                                 public void accept(Long aLong) throws Exception {
-                                    doThrowableConsumer(e);
+                                    doThrowableConsumer(callBack, e);
                                 }
                             });
                 }else{
-                    doThrowableConsumer(e);
+                    doThrowableConsumer(callBack, e);
                 }
             }
         };
     }
 
-    private void doThrowableConsumer(Throwable e){
-        if(null != getCallBack()){
-            getCallBack().onFail(e);
+    private <T> void doThrowableConsumer(final CallBack<T> callBack, Throwable e){
+        if(null != callBack){
+            callBack.onFail(e);
         }
         if(isShowDialog() && null != getDialog()){
             getDialog().dismissLoading(getActivity());
@@ -258,12 +252,12 @@ public class RxBuilder {
     /** 最终结果的处理
      * @return 和getThrowableConsumer互斥
      */
-    private Action getDefaultAction(){
+    private <T> Action getDefaultAction(final CallBack<T> callBack){
         return new Action() {
             @Override
             public void run() throws Exception {
-                if(null != getCallBack()){
-                    getCallBack().onComplete();
+                if(null != callBack){
+                    callBack.onComplete();
                 }
             }
         };
