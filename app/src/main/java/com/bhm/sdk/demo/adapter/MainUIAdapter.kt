@@ -1,9 +1,9 @@
 package com.bhm.sdk.demo.adapter
 
 import android.widget.TextView
+import com.bhm.netcore.R
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
-import com.microport.netcore.R
 
 /**
  * Created by bhm on 2022/9/15.

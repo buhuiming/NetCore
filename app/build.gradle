@@ -7,7 +7,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.microport.netcore"
+        applicationId "com.bhm.netcore"
         minSdk 24
         targetSdk 32
         versionCode 1

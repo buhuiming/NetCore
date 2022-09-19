@@ -6,9 +6,9 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
-import com.microport.netcore.R
-import com.microport.rxhttp.rxjava.RxBuilder
-import com.microport.rxhttp.utils.RxLoadingFragment
+import com.bhm.netcore.R
+import com.bhm.rxhttp.rxjava.RxBuilder
+import com.bhm.rxhttp.utils.RxLoadingFragment
 
 class MyRxLoadingFragment internal constructor(private val rxBuilder: RxBuilder) :
     RxLoadingFragment(
@@ -18,7 +18,7 @@ class MyRxLoadingFragment internal constructor(private val rxBuilder: RxBuilder)
         val inflater = LayoutInflater.from(activity)
         @SuppressLint("InflateParams") val v =
             inflater.inflate(R.layout.layout_my_loading, null) // 得到加载view
-        val dialog = Dialog(requireActivity(), com.microport.rxhttp.R.style.loading_dialog) // 创建自定义样式dialog
+        val dialog = Dialog(requireActivity(), com.bhm.rxhttp.R.style.loading_dialog) // 创建自定义样式dialog
         dialog.setCancelable(rxBuilder.isCancelable) // false不可以用“返回键”取消
         dialog.setCanceledOnTouchOutside(false)
         dialog.setContentView(
