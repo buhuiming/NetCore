@@ -18,12 +18,12 @@ import com.bhm.sdk.demo.entity.DoPostEntity
 import com.bhm.sdk.demo.entity.UpLoadEntity
 import com.bhm.sdk.demo.http.HttpApi
 import com.bhm.sdk.demo.tools.Utils.getFile
-import com.bhm.rxhttp.base.RxBaseActivity
-import com.bhm.rxhttp.core.RxBuilder.Companion.newBuilder
+import com.bhm.rxhttp.base.HttpActivity
 import com.bhm.rxhttp.core.callback.CallBack
-import com.bhm.rxhttp.core.callback.RxDownLoadCallBack
-import com.bhm.rxhttp.core.callback.RxUpLoadCallBack
-import com.bhm.rxhttp.base.RxLoadingDialog.Companion.defaultDialog
+import com.bhm.rxhttp.core.callback.DownLoadCallBack
+import com.bhm.rxhttp.core.callback.UpLoadCallBack
+import com.bhm.rxhttp.base.HttpLoadingDialog.Companion.defaultDialog
+import com.bhm.rxhttp.core.HttpBuilder
 import com.tbruyelle.rxpermissions3.RxPermissions
 import io.reactivex.rxjava3.disposables.Disposable
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -36,7 +36,7 @@ import java.io.File
 
 @Suppress("PrivatePropertyName")
 @SuppressLint("CheckResult")
-open class MainActivity : RxBaseActivity() {
+open class MainActivity : HttpActivity() {
     private var main_recycle_view: RecyclerView? = null
     private var adapter: MainUIAdapter? = null
     private var progressBarHorizontal: ProgressBar? = null
@@ -93,16 +93,16 @@ open class MainActivity : RxBaseActivity() {
             0 -> doGet()
             1 -> doPost()
             2 -> upLoad()
-            3 -> rxManager.removeObserver(up_Disposable)
+            3 -> disposeManager.removeDispose(up_Disposable)
             4 -> {
                 downLoadLength = 0
                 downLoad()
             }
             5 -> {
-                if (!rxManager.isExitObserver(down_Disposable!!)) {
+                if (!disposeManager.isExitDispose(down_Disposable!!)) {
                     return
                 }
-                rxManager.removeObserver(down_Disposable)
+                disposeManager.removeDispose(down_Disposable)
             }
             6 -> downLoad()
             else -> {}
@@ -143,21 +143,21 @@ open class MainActivity : RxBaseActivity() {
 
     private fun doGet() {
         /*单独使用配置*/
-        /*RxBuilder builder = RxBuilder.newBuilder(this)
+        /*HttpBuilder builder = HttpBuilder.create(this)
                 .setLoadingDialog(RxLoadingDialog.getDefaultDialog())
 //                .setLoadingDialog(new MyLoadingDialog())
                 .setDialogAttribute(true, false, false)
                 .setHttpTimeOut(20000, 20000)
                 .setIsLogOutPut(true)//默认是false
                 .setIsDefaultToast(true, getRxManager())
-                .bindRx();*/
+                .build();*/
 
         /*默认使用Application的配置*/
-        val builder = newBuilder(this)
+        val builder = HttpBuilder.create(this)
             .setLoadingDialog(defaultDialog)
-            .bindRx()
+            .build()
         val observable = builder
-            .createApi(HttpApi::class.java, "http://news-at.zhihu.com")
+            .createRequest(HttpApi::class.java, "http://news-at.zhihu.com")
             .getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
         builder.setCallBack(observable, object : CallBack<DoGetEntity>() {
             override fun onSuccess(response: DoGetEntity) {
@@ -167,12 +167,12 @@ open class MainActivity : RxBaseActivity() {
 
             override fun onFail(e: Throwable?) {
                 super.onFail(e)
-                val builder1 = newBuilder(this@MainActivity)
+                val builder1 = HttpBuilder.create(this@MainActivity)
                     .setLoadingDialog(defaultDialog)
                     .setLoadingTitle("dsadasd")
-                    .bindRx()
+                    .build()
                 val observable1 = builder1
-                    .createApi(HttpApi::class.java, "http://news-at.zhihu.com")
+                    .createRequest(HttpApi::class.java, "http://news-at.zhihu.com")
                     .getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
                 builder1.setCallBack(observable1, object : CallBack<DoGetEntity>() {
                     override fun onSuccess(response: DoGetEntity) {
@@ -185,8 +185,9 @@ open class MainActivity : RxBaseActivity() {
     }
 
     private fun doPost() {
-        val builder = newBuilder(this)
-            .setLoadingDialog(defaultDialog) //                .setLoadingDialog(new MyLoadingDialog())
+        val builder = HttpBuilder.create(this)
+            .setLoadingDialog(defaultDialog)
+//          .setLoadingDialog(new MyLoadingDialog())
             .setDialogAttribute(
                 isShowDialog = true,
                 cancelable = false,
@@ -194,9 +195,9 @@ open class MainActivity : RxBaseActivity() {
             ) //.setHttpTimeOut()
             .setIsLogOutPut(true)
             .setIsDefaultToast(false)
-            .bindRx()
+            .build()
         val observable = builder
-            .createApi(HttpApi::class.java, "https://www.pgyer.com/")
+            .createRequest(HttpApi::class.java, "https://www.pgyer.com/")
             .getDataPost("963ca3d091ba71bdd8596994ad7549b5", "android")
         builder.setCallBack(observable, object : CallBack<DoPostEntity>() {
             override fun onSuccess(response: DoPostEntity) {
@@ -217,7 +218,7 @@ open class MainActivity : RxBaseActivity() {
         val file = getFile(this)
         val requestBody: RequestBody = file.asRequestBody("*/*; charset=UTF-8".toMediaTypeOrNull())
         val part: MultipartBody.Part = createFormData("file", file.name, requestBody) //key(file)与服务器一致
-        val builder = newBuilder(this)
+        val builder = HttpBuilder.create(this)
             .setLoadingDialog(defaultDialog)
             .setDialogAttribute(
                 isShowDialog = false,
@@ -226,9 +227,9 @@ open class MainActivity : RxBaseActivity() {
             )
             .setIsLogOutPut(true) //默认是false
             .setIsDefaultToast(true)
-            .bindRx()
+            .build()
         val observable = builder
-            .createApi(
+            .createRequest(
                 HttpApi::class.java,
                 "https://upload.pgyer.com/",
                 rxUpLoadListener
@@ -244,8 +245,8 @@ open class MainActivity : RxBaseActivity() {
             }
 
             override fun onSuccess(response: UpLoadEntity) {
-                Log.i("MainActivity--> ", response.data!!.appCreated!!)
-                Toast.makeText(this@MainActivity, response.data!!.appCreated, Toast.LENGTH_SHORT)
+                Log.i("MainActivity--> ", response.data?.appCreated?: "")
+                Toast.makeText(this@MainActivity, response.data?.appCreated, Toast.LENGTH_SHORT)
                     .show()
             }
 
@@ -270,10 +271,9 @@ open class MainActivity : RxBaseActivity() {
      * rxDownLoadListener不能为空
      */
     private fun downLoadFile() {
-        val filePath = (getExternalFilesDir("apk")!!.path
-                + File.separator)
+        val filePath = getExternalFilesDir("apk")?.path + File.separator
         val fileName = "demo.apk"
-        val builder = newBuilder(this)
+        val builder = HttpBuilder.create(this)
             .setLoadingDialog(defaultDialog)
             .setDialogAttribute(
                 isShowDialog = false,
@@ -283,14 +283,14 @@ open class MainActivity : RxBaseActivity() {
             .setDownLoadFileAtr(filePath, fileName, true, downLoadLength)
             .setIsLogOutPut(true)
             .setIsDefaultToast(true)
-            .bindRx()
+            .build()
         val observable = builder //域名随便填写,但必须以“/”为结尾
-            .createApi(HttpApi::class.java, "http://s.downpp.com/", rxDownLoadListener)
+            .createRequest(HttpApi::class.java, "http://s.downpp.com/", rxDownLoadListener)
             .downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
         down_Disposable = builder.beginDownLoad(observable)
     }
 
-    private val rxUpLoadListener: RxUpLoadCallBack = object : RxUpLoadCallBack() {
+    private val rxUpLoadListener: UpLoadCallBack = object : UpLoadCallBack() {
         override fun onStart() {
             progressBarHorizontal!!.progress = 0
         }
@@ -312,7 +312,7 @@ open class MainActivity : RxBaseActivity() {
         }
     }
 
-    private val rxDownLoadListener: RxDownLoadCallBack = object : RxDownLoadCallBack() {
+    private val rxDownLoadListener: DownLoadCallBack = object : DownLoadCallBack() {
         override fun onStart() {
             progressBarHorizontal!!.progress = 0
         }

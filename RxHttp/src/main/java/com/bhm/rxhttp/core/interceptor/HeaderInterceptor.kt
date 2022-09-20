@@ -1,6 +1,6 @@
 package com.bhm.rxhttp.core.interceptor
 
-import com.bhm.rxhttp.core.RxBuilder
+import com.bhm.rxhttp.core.HttpBuilder
 import okhttp3.Interceptor
 
 /**
@@ -9,7 +9,7 @@ import okhttp3.Interceptor
  * @date :2022/9/16 16:57
  */
 class HeaderInterceptor {
-    fun make(builder: RxBuilder): Interceptor {
+    fun make(builder: HttpBuilder): Interceptor {
         return Interceptor { chain: Interceptor.Chain ->
             val requestBuilder: okhttp3.Request.Builder = chain.request()
                 .newBuilder()

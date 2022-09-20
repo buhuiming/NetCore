@@ -19,7 +19,7 @@ class GenerateOkHttpClient {
 
     private var timeOutConnection = 20 //连接超时
 
-    fun make(builder: RxBuilder): OkHttpClient {
+    fun make(builder: HttpBuilder): OkHttpClient {
         if (null != builder.okHttpClient) {
             return builder.okHttpClient!!
         }

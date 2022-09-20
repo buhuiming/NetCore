@@ -1,16 +1,16 @@
 package com.bhm.rxhttp.core
 
-import com.bhm.rxhttp.base.RxLoadingDialog
+import com.bhm.rxhttp.base.HttpLoadingDialog
 import okhttp3.OkHttpClient
 
 /**
  * Created by bhm on 2022/9/15.
  */
 @Suppress("unused")
-class RxConfig(builder: Builder) {
+class HttpConfig(builder: Builder) {
 
     class Builder {
-        internal var dialog: RxLoadingDialog? = null
+        internal var dialog: HttpLoadingDialog? = null
         internal var isShowDialog = false
         internal var cancelable = false
         internal var dialogDismissInterruptRequest = false
@@ -27,7 +27,7 @@ class RxConfig(builder: Builder) {
         internal var defaultHeader: HashMap<String, String>? = null
         internal var delaysProcessLimitTime: Long = 0
 
-        fun setRxLoadingDialog(setDialog: RxLoadingDialog?): Builder {
+        fun setLoadingDialog(setDialog: HttpLoadingDialog?): Builder {
             dialog = setDialog
             return this
         }
@@ -100,14 +100,14 @@ class RxConfig(builder: Builder) {
             return this
         }
 
-        fun build(): RxConfig {
-            return RxConfig(this)
+        fun build(): HttpConfig {
+            return HttpConfig(this)
         }
     }
 
     companion object {
         @JvmStatic
-        var rxLoadingDialog: RxLoadingDialog? = null
+        var httpLoadingDialog: HttpLoadingDialog? = null
             private set
         @JvmStatic
         var isShowDialog: Boolean = false
@@ -154,7 +154,7 @@ class RxConfig(builder: Builder) {
             private set
 
         @JvmStatic
-        fun newBuilder(): Builder {
+        fun create(): Builder {
             return Builder()
         }
 
@@ -170,7 +170,7 @@ class RxConfig(builder: Builder) {
     }
 
     init {
-        rxLoadingDialog = builder.dialog
+        httpLoadingDialog = builder.dialog
         isShowDialog = builder.isShowDialog
         cancelable = builder.cancelable
         isDefaultToast = builder.isDefaultToast

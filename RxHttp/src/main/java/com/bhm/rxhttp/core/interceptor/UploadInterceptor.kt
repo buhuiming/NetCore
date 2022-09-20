@@ -1,6 +1,6 @@
 package com.bhm.rxhttp.core.interceptor
 
-import com.bhm.rxhttp.core.RxBuilder
+import com.bhm.rxhttp.core.HttpBuilder
 import com.bhm.rxhttp.body.UpLoadRequestBody
 import okhttp3.Interceptor
 
@@ -10,7 +10,7 @@ import okhttp3.Interceptor
  * @date :2022/9/16 17:00
  */
 class UploadInterceptor {
-    fun make(builder: RxBuilder?): Interceptor {
+    fun make(builder: HttpBuilder?): Interceptor {
         return Interceptor { chain ->
             val request = chain.request()
             if (null == request.body) {

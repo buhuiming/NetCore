@@ -1,8 +1,8 @@
 package com.bhm.rxhttp.core.interceptor
 
 import android.util.Log
-import com.bhm.rxhttp.core.RxBuilder
-import com.bhm.rxhttp.define.RxUtil.logger
+import com.bhm.rxhttp.core.HttpBuilder
+import com.bhm.rxhttp.define.CommonUtil.logger
 import okhttp3.logging.HttpLoggingInterceptor
 import java.net.URLDecoder
 import java.util.regex.Pattern
@@ -16,7 +16,7 @@ class LoggingInterceptor {
 
     private val mMessage = StringBuilder()
 
-    fun make(builder: RxBuilder): HttpLoggingInterceptor {
+    fun make(builder: HttpBuilder): HttpLoggingInterceptor {
         return HttpLoggingInterceptor { message: String ->
             if (builder.isLogOutPut) {
                 // 请求或者响应开始

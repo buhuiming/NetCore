@@ -12,11 +12,11 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.bhm.rxhttp.R
-import com.bhm.rxhttp.core.RxBuilder
+import com.bhm.rxhttp.core.HttpBuilder
 import com.trello.rxlifecycle4.components.support.RxDialogFragment
 import java.util.*
 
-open class RxLoadingFragment(private val builder: RxBuilder) : RxDialogFragment() {
+open class HttpLoadingFragment(private val builder: HttpBuilder) : RxDialogFragment() {
 
     private var textView: TextView? = null
 
@@ -75,7 +75,7 @@ open class RxLoadingFragment(private val builder: RxBuilder) : RxDialogFragment(
                 ) {
                     if (builder.isCancelable) {
                         if (builder.isDialogDismissInterruptRequest) {
-                            builder.rxManager?.removeObserver()
+                            builder.disposeManager?.removeDispose()
                         }
                         dismiss()
                         return@OnKeyListener true
@@ -83,7 +83,7 @@ open class RxLoadingFragment(private val builder: RxBuilder) : RxDialogFragment(
                     if (System.currentTimeMillis() - onBackPressed > 1000) {
                         onBackPressed = System.currentTimeMillis()
                     } else {
-                        builder.rxManager?.removeObserver()
+                        builder.disposeManager?.removeDispose()
                         dismiss()
                     }
                 }
@@ -112,11 +112,11 @@ open class RxLoadingFragment(private val builder: RxBuilder) : RxDialogFragment(
     }
 
     /** 改变Dialog的显示内容
-     * @param rxBuilder
+     * @param httpBuilder
      */
-    fun changDialogContent(rxBuilder: RxBuilder) {
-        if (textView != null && !TextUtils.isEmpty(rxBuilder.loadingTitle)) {
-            textView!!.text = rxBuilder.loadingTitle
+    fun changDialogContent(httpBuilder: HttpBuilder) {
+        if (textView != null && !TextUtils.isEmpty(httpBuilder.loadingTitle)) {
+            textView!!.text = httpBuilder.loadingTitle
         }
     }
 

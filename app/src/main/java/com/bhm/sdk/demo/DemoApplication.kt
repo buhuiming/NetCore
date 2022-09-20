@@ -1,8 +1,8 @@
 package com.bhm.sdk.demo
 
 import android.app.Application
-import com.bhm.sdk.demo.tools.MyLoadingDialog
-import com.bhm.rxhttp.core.RxConfig
+import com.bhm.sdk.demo.tools.MyHttpLoadingDialog
+import com.bhm.rxhttp.core.HttpConfig
 
 /**
  * Created by bhm on 2022/9/15.
@@ -11,8 +11,8 @@ class DemoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         /*配置默认的Rx配置项*/
-        RxConfig.newBuilder()
-            .setRxLoadingDialog(MyLoadingDialog())
+        HttpConfig.create()
+            .setLoadingDialog(MyHttpLoadingDialog())
             .setDialogAttribute(
                 isShowDialog = true,
                 cancelable = false,

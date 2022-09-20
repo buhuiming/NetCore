@@ -2,16 +2,16 @@ package com.bhm.rxhttp.core
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import com.bhm.rxhttp.base.RxBaseActivity
-import com.bhm.rxhttp.core.RxConfig.Companion.cancelable
-import com.bhm.rxhttp.core.RxConfig.Companion.rxLoadingDialog
-import com.bhm.rxhttp.core.RxConfig.Companion.writtenLength
-import com.bhm.rxhttp.core.RxManager.Companion.rxSchedulerHelper
+import com.bhm.rxhttp.base.HttpActivity
+import com.bhm.rxhttp.core.HttpConfig.Companion.cancelable
+import com.bhm.rxhttp.core.HttpConfig.Companion.httpLoadingDialog
+import com.bhm.rxhttp.core.HttpConfig.Companion.writtenLength
+import com.bhm.rxhttp.core.DisposeManager.Companion.rxSchedulerHelper
 import com.bhm.rxhttp.core.callback.CallBack
-import com.bhm.rxhttp.core.callback.RxStreamCallBackImp
+import com.bhm.rxhttp.core.callback.StreamCallBackImp
 import com.bhm.rxhttp.define.ResultException
-import com.bhm.rxhttp.base.RxLoadingDialog
-import com.bhm.rxhttp.define.RxUtil.logger
+import com.bhm.rxhttp.base.HttpLoadingDialog
+import com.bhm.rxhttp.define.CommonUtil.logger
 import com.google.gson.JsonSyntaxException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -31,22 +31,22 @@ import java.util.concurrent.TimeoutException
  * Created by bhm on 2022/9/15.
  */
 @Suppress("unused")
-class RxBuilder(private val builder: Builder) {
-    var listener: RxStreamCallBackImp? = null
+class HttpBuilder(private val builder: Builder) {
+    var listener: StreamCallBackImp? = null
         private set
     private var currentRequestDateTamp: Long = 0
-    val activity: RxBaseActivity
+    val activity: HttpActivity
         get() = builder.activity
     val isShowDialog: Boolean
         get() = builder.isShowDialog
     val isLogOutPut: Boolean
         get() = builder.isLogOutPut
-    val dialog: RxLoadingDialog?
+    val dialog: HttpLoadingDialog?
         get() = builder.dialog
     private val isDefaultToast: Boolean
         get() = builder.isDefaultToast
-    val rxManager: RxManager?
-        get() = builder.rxManager
+    val disposeManager: DisposeManager?
+        get() = builder.disposeManager
     val readTimeOut: Int
         get() = builder.readTimeOut
     val connectTimeOut: Int
@@ -75,12 +75,12 @@ class RxBuilder(private val builder: Builder) {
     private val delaysProcessLimitTime: Long
         get() = builder.delaysProcessLimitTime
 
-    fun <T> createApi(cla: Class<T>, host: String): T {
+    fun <T> createRequest(cla: Class<T>, host: String): T {
         if (builder.isShowDialog && null != builder.dialog) {
             builder.dialog!!.showLoading(this)
         }
-        return RetrofitCreateHelper(this)
-            .createApi(cla, host)
+        return RetrofitHelper(this)
+            .createRequest(cla, host)
     }
 
     /** 上传请求
@@ -89,7 +89,7 @@ class RxBuilder(private val builder: Builder) {
      * @param listener
      * @return
      */
-    fun <T> createApi(cla: Class<T>, host: String, listener: RxStreamCallBackImp?): T {
+    fun <T> createRequest(cla: Class<T>, host: String, listener: StreamCallBackImp?): T {
         if (null == listener) {
             throw NullPointerException("RxStreamCallBackImp(listener) can not be null!")
         }
@@ -97,8 +97,8 @@ class RxBuilder(private val builder: Builder) {
             builder.dialog!!.showLoading(this)
         }
         this.listener = listener
-        return RetrofitCreateHelper(this)
-            .createApi(cla, host)
+        return RetrofitHelper(this)
+            .createRequest(cla, host)
     }
 
     fun <T: Any> setCallBack(observable: Observable<T>, callBack: CallBack<T>?): Disposable {
@@ -113,7 +113,7 @@ class RxBuilder(private val builder: Builder) {
         currentRequestDateTamp = System.currentTimeMillis()
         //做准备工作
         callBack?.onStart(disposable)
-        builder.rxManager?.subscribe(disposable)
+        builder.disposeManager?.add(disposable)
         return disposable
     }
 
@@ -140,7 +140,7 @@ class RxBuilder(private val builder: Builder) {
     @SuppressLint("CheckResult")
     private fun <T> getThrowableConsumer(callBack: CallBack<T>?): Consumer<Throwable> {
         return Consumer { e ->
-            logger(this@RxBuilder, "ThrowableConsumer-> ", e.message) //抛异常
+            logger(this@HttpBuilder, "ThrowableConsumer-> ", e.message) //抛异常
             if (System.currentTimeMillis() - currentRequestDateTamp <= delaysProcessLimitTime) {
                 Observable.timer(delaysProcessLimitTime, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
@@ -205,32 +205,32 @@ class RxBuilder(private val builder: Builder) {
                         builder.dialog!!.dismissLoading(builder.activity)
                     }
                 }
-                builder.rxManager?.removeObserver()
+                builder.disposeManager?.removeDispose()
             }
-        builder.rxManager?.subscribe(disposable)
+        builder.disposeManager?.add(disposable)
         return disposable
     }
 
-    class Builder(val activity: RxBaseActivity) {
-        internal var rxManager: RxManager? = activity.rxManager
-        internal var isShowDialog = RxConfig.isShowDialog
+    class Builder(val activity: HttpActivity) {
+        internal var disposeManager: DisposeManager? = activity.disposeManager
+        internal var isShowDialog = HttpConfig.isShowDialog
         internal var isCancelable = cancelable()
-        internal var dialog = rxLoadingDialog
-        internal var isDefaultToast = RxConfig.isDefaultToast
-        internal var readTimeOut = RxConfig.readTimeOut
-        internal var connectTimeOut = RxConfig.connectTimeOut
-        internal var okHttpClient = RxConfig.okHttpClient
-        internal var isLogOutPut = RxConfig.isLogOutPut
-        internal var filePath = RxConfig.filePath
-        internal var fileName = RxConfig.fileName
+        internal var dialog = httpLoadingDialog
+        internal var isDefaultToast = HttpConfig.isDefaultToast
+        internal var readTimeOut = HttpConfig.readTimeOut
+        internal var connectTimeOut = HttpConfig.connectTimeOut
+        internal var okHttpClient = HttpConfig.okHttpClient
+        internal var isLogOutPut = HttpConfig.isLogOutPut
+        internal var filePath = HttpConfig.filePath
+        internal var fileName = HttpConfig.fileName
         internal var writtenLength = writtenLength()
-        internal var isAppendWrite = RxConfig.isAppendWrite
-        internal var loadingTitle = RxConfig.loadingTitle
-        internal var isDialogDismissInterruptRequest = RxConfig.isDialogDismissInterruptRequest
-        internal var defaultHeader = RxConfig.defaultHeader
-        internal var delaysProcessLimitTime = RxConfig.delaysProcessLimitTime
+        internal var isAppendWrite = HttpConfig.isAppendWrite
+        internal var loadingTitle = HttpConfig.loadingTitle
+        internal var isDialogDismissInterruptRequest = HttpConfig.isDialogDismissInterruptRequest
+        internal var defaultHeader = HttpConfig.defaultHeader
+        internal var delaysProcessLimitTime = HttpConfig.delaysProcessLimitTime
 
-        fun setLoadingDialog(dialog: RxLoadingDialog?): Builder {
+        fun setLoadingDialog(dialog: HttpLoadingDialog?): Builder {
             this.dialog = dialog
             return this
         }
@@ -300,14 +300,14 @@ class RxBuilder(private val builder: Builder) {
             return this
         }
 
-        fun bindRx(): RxBuilder {
-            return RxBuilder(this)
+        fun build(): HttpBuilder {
+            return HttpBuilder(this)
         }
     }
 
     companion object {
         @JvmStatic
-        fun newBuilder(activity: RxBaseActivity): Builder {
+        fun create(activity: HttpActivity): Builder {
             return Builder(activity)
         }
     }

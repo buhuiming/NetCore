@@ -2,9 +2,9 @@ package com.bhm.rxhttp.body
 
 import okhttp3.ResponseBody
 import android.annotation.SuppressLint
-import com.bhm.rxhttp.core.RxBuilder
-import com.bhm.rxhttp.core.callback.RxDownLoadCallBack
-import com.bhm.rxhttp.define.RxUtil
+import com.bhm.rxhttp.core.HttpBuilder
+import com.bhm.rxhttp.core.callback.DownLoadCallBack
+import com.bhm.rxhttp.define.CommonUtil
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MediaType
@@ -16,7 +16,7 @@ import java.io.IOException
  */
 class DownLoadResponseBody(
     private val responseBody: ResponseBody,
-    private val rxBuilder: RxBuilder?
+    private val httpBuilder: HttpBuilder?
 ) : ResponseBody() {
     // BufferedSource 是okio库中的输入流，这里就当作inputStream来使用。
     private var bufferedSource: BufferedSource? = null
@@ -37,23 +37,23 @@ class DownLoadResponseBody(
 
     private fun source(source: Source): Source {
         return object : ForwardingSource(source) {
-            var totalBytesRead = rxBuilder?.writtenLength() ?: 0L
-            val totalBytes = if (rxBuilder == null) responseBody.contentLength() else rxBuilder.writtenLength() + responseBody.contentLength()
+            var totalBytesRead = httpBuilder?.writtenLength() ?: 0L
+            val totalBytes = if (httpBuilder == null) responseBody.contentLength() else httpBuilder.writtenLength() + responseBody.contentLength()
 
             @SuppressLint("CheckResult")
             @Throws(IOException::class)
             override fun read(sink: Buffer, byteCount: Long): Long {
                 val bytesRead = super.read(sink, byteCount)
                 // read() returns the number of bytes read, or -1 if this source is exhausted.
-                if (rxBuilder?.listener != null &&
-                    rxBuilder.listener is RxDownLoadCallBack) {
+                if (httpBuilder?.listener != null &&
+                    httpBuilder.listener is DownLoadCallBack) {
                     if (totalBytesRead == 0L && bytesRead != -1L) {
-                        RxUtil.deleteFile(rxBuilder, totalBytes)
+                        CommonUtil.deleteFile(httpBuilder, totalBytes)
                         Observable.just(bytesRead)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
-                                (rxBuilder.listener as RxDownLoadCallBack).onStart()
-                                RxUtil.logger(rxBuilder, "DownLoad-- > ", "begin downLoad")
+                                (httpBuilder.listener as DownLoadCallBack).onStart()
+                                CommonUtil.logger(httpBuilder, "DownLoad-- > ", "begin downLoad")
                             }
                     }
                     totalBytesRead += if (bytesRead != -1L) bytesRead else 0
@@ -62,7 +62,7 @@ class DownLoadResponseBody(
                         Observable.just(bytesRead)
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribe {
-                                (rxBuilder.listener as RxDownLoadCallBack).onProgress(
+                                (httpBuilder.listener as DownLoadCallBack).onProgress(
                                     if (progress > 100) 100 else progress,
                                     bytesRead,
                                     totalBytes
@@ -72,16 +72,16 @@ class DownLoadResponseBody(
                             Observable.just(bytesRead)
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribe {
-                                    (rxBuilder.listener as RxDownLoadCallBack).onProgress(100, bytesRead, totalBytes)
-                                    (rxBuilder.listener as RxDownLoadCallBack).onFinish()
-                                    RxUtil.logger(rxBuilder, "DownLoad-- > ", "finish downLoad")
-                                    if (null != rxBuilder.dialog && rxBuilder.isShowDialog) {
-                                        rxBuilder.dialog?.dismissLoading(rxBuilder.activity)
+                                    (httpBuilder.listener as DownLoadCallBack).onProgress(100, bytesRead, totalBytes)
+                                    (httpBuilder.listener as DownLoadCallBack).onFinish()
+                                    CommonUtil.logger(httpBuilder, "DownLoad-- > ", "finish downLoad")
+                                    if (null != httpBuilder.dialog && httpBuilder.isShowDialog) {
+                                        httpBuilder.dialog?.dismissLoading(httpBuilder.activity)
                                     }
                                 }
                         }
                     }
-                    RxUtil.writeFile(sink.inputStream(), rxBuilder)
+                    CommonUtil.writeFile(sink.inputStream(), httpBuilder)
                 }
                 return bytesRead
             }

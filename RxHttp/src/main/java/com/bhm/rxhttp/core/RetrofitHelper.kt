@@ -11,9 +11,9 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 /**
  * Created by bhm on 2022/9/15.
  */
-class RetrofitCreateHelper(private val builder: RxBuilder) {
+class RetrofitHelper(private val builder: HttpBuilder) {
 
-    fun <T> createApi(clazz: Class<T>, url: String): T {
+    fun <T> createRequest(clazz: Class<T>, url: String): T {
         val retrofit = Retrofit.Builder()
             .baseUrl(url)
             .client(GenerateOkHttpClient().make(builder))

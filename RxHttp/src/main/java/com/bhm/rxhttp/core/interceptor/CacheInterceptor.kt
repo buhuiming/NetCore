@@ -3,7 +3,7 @@ package com.bhm.rxhttp.core.interceptor
 import android.content.Context
 import android.net.ConnectivityManager
 import com.bhm.rxhttp.core.HttpCache.getUserAgent
-import com.bhm.rxhttp.core.RxBuilder
+import com.bhm.rxhttp.core.HttpBuilder
 import okhttp3.CacheControl
 import okhttp3.Interceptor
 
@@ -13,7 +13,7 @@ import okhttp3.Interceptor
  * @date :2022/9/16 16:55
  */
 class CacheInterceptor {
-    fun make(builder: RxBuilder): Interceptor {
+    fun make(builder: HttpBuilder): Interceptor {
         return Interceptor { chain ->
             var request = chain.request()
             if (isNetworkConnected(builder.activity)) {

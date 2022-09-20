@@ -1,9 +1,9 @@
 package com.bhm.rxhttp.body
 
 import android.annotation.SuppressLint
-import com.bhm.rxhttp.core.RxBuilder
-import com.bhm.rxhttp.core.callback.RxUpLoadCallBack
-import com.bhm.rxhttp.define.RxUtil
+import com.bhm.rxhttp.core.HttpBuilder
+import com.bhm.rxhttp.core.callback.UpLoadCallBack
+import com.bhm.rxhttp.define.CommonUtil
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import okhttp3.MediaType
@@ -14,7 +14,7 @@ import java.io.IOException
 /**
  * Created by bhm on 2022/9/15.
  */
-class UpLoadRequestBody(private val mRequestBody: RequestBody, private val rxBuilder: RxBuilder?) :
+class UpLoadRequestBody(private val mRequestBody: RequestBody, private val httpBuilder: HttpBuilder?) :
     RequestBody() {
     override fun contentType(): MediaType? {
         return mRequestBody.contentType()
@@ -46,8 +46,8 @@ class UpLoadRequestBody(private val mRequestBody: RequestBody, private val rxBui
         @Throws(IOException::class)
         override fun write(source: Buffer, byteCount: Long) {
             super.write(source, byteCount)
-            if (rxBuilder?.listener != null &&
-                rxBuilder.listener is RxUpLoadCallBack
+            if (httpBuilder?.listener != null &&
+                httpBuilder.listener is UpLoadCallBack
             ) {
                 if (contentLength == 0L) {
                     contentLength = contentLength()
@@ -56,8 +56,8 @@ class UpLoadRequestBody(private val mRequestBody: RequestBody, private val rxBui
                     Observable.just(bytesWritten)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe {
-                            (rxBuilder.listener as RxUpLoadCallBack).onStart()
-                            RxUtil.logger(rxBuilder, "upLoad-- > ", "begin upLoad")
+                            (httpBuilder.listener as UpLoadCallBack).onStart()
+                            CommonUtil.logger(httpBuilder, "upLoad-- > ", "begin upLoad")
                         }
                 }
                 bytesWritten += byteCount
@@ -65,7 +65,7 @@ class UpLoadRequestBody(private val mRequestBody: RequestBody, private val rxBui
                 Observable.just(bytesWritten)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe {
-                        (rxBuilder.listener as RxUpLoadCallBack).onProgress(
+                        (httpBuilder.listener as UpLoadCallBack).onProgress(
                             if (progress > 100) 100 else progress,
                             byteCount,
                             contentLength

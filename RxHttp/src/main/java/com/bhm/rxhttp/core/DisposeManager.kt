@@ -11,13 +11,13 @@ import java.util.ArrayList
  * Created by bhm on 2022/9/15.
  * 用于管理每个请求
  */
-class RxManager {
+class DisposeManager {
 
     private val mCompositeDisposable = CompositeDisposable() //管理订阅者者
 
     private var list: MutableList<Disposable>? = ArrayList()
 
-    fun subscribe(d: Disposable) {
+    fun add(d: Disposable) {
         if (null == list) {
             list = ArrayList()
         }
@@ -30,7 +30,7 @@ class RxManager {
     /**
      * 清空监听，再次调用需new CompositeDisposable()
      */
-    fun unSubscribe() {
+    fun dispose() {
         mCompositeDisposable.dispose() //取消订阅  activity销毁时调用
         list = null
     }
@@ -38,7 +38,7 @@ class RxManager {
     /**
      * 取消一个请求
      */
-    fun removeObserver() { //中断监听 取消请求
+    fun removeDispose() { //中断监听 取消请求
         if (null != list && list!!.size > 0) {
             mCompositeDisposable.remove(list!![list!!.size - 1])
             list!!.remove(list!![list!!.size - 1])
@@ -48,7 +48,7 @@ class RxManager {
     /**
      * 取消一个请求
      */
-    fun removeObserver(disposable: Disposable?) { //中断监听 取消请求
+    fun removeDispose(disposable: Disposable?) { //中断监听 取消请求
         if (null != disposable) {
             mCompositeDisposable.remove(disposable)
             if (list != null) {
@@ -57,7 +57,7 @@ class RxManager {
         }
     }
 
-    fun isExitObserver(disposable: Disposable): Boolean {
+    fun isExitDispose(disposable: Disposable): Boolean {
         return null != list && list!!.contains(disposable)
     }
 

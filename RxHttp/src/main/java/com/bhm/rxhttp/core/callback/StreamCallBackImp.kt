@@ -3,7 +3,7 @@ package com.bhm.rxhttp.core.callback
 /**
  * Created by bhm on 2022/9/15.
  */
-abstract class RxStreamCallBackImp {
+abstract class StreamCallBackImp {
     abstract fun onStart()
     abstract fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long)
     abstract fun onFinish()
