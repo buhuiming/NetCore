@@ -22,7 +22,7 @@ class DisposeManager {
             list = ArrayList()
         }
         if (!list!!.contains(d)) {
-            list!!.add(d)
+            list?.add(d)
             mCompositeDisposable.add(d) //注册订阅
         }
     }

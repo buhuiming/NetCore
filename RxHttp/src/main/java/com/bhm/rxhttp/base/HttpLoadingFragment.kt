@@ -116,7 +116,7 @@ open class HttpLoadingFragment(private val builder: HttpBuilder) : RxDialogFragm
      */
     fun changDialogContent(httpBuilder: HttpBuilder) {
         if (textView != null && !TextUtils.isEmpty(httpBuilder.loadingTitle)) {
-            textView!!.text = httpBuilder.loadingTitle
+            textView?.text = httpBuilder.loadingTitle
         }
     }
 

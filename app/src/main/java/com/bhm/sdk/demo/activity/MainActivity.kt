@@ -58,16 +58,16 @@ open class MainActivity : HttpActivity() {
         progressBarHorizontal = findViewById<View>(R.id.progressBarHorizontal) as ProgressBar
         val ms = LinearLayoutManager(this)
         ms.orientation = LinearLayoutManager.VERTICAL
-        main_recycle_view!!.layoutManager = ms
-        main_recycle_view!!.addItemDecoration(
+        main_recycle_view?.layoutManager = ms
+        main_recycle_view?.addItemDecoration(
             DividerItemDecoration(
                 this,
                 DividerItemDecoration.VERTICAL
             )
         )
-        main_recycle_view!!.setHasFixedSize(false)
+        main_recycle_view?.setHasFixedSize(false)
         adapter = MainUIAdapter(items)
-        main_recycle_view!!.adapter = adapter
+        main_recycle_view?.adapter = adapter
     }
 
     private val items: MutableList<String?>
@@ -85,7 +85,7 @@ open class MainActivity : HttpActivity() {
         }
 
     private fun initListener() {
-        adapter!!.setOnItemClickListener { _, _, position -> openUI(position) }
+        adapter?.setOnItemClickListener { _, _, position -> openUI(position) }
     }
 
     private fun openUI(position: Int) {
@@ -202,13 +202,13 @@ open class MainActivity : HttpActivity() {
         builder.setCallBack(observable, object : CallBack<DoPostEntity>() {
             override fun onSuccess(response: DoPostEntity) {
                 Log.i("MainActivity--> ", response.toString())
-                Toast.makeText(this@MainActivity, response.data!!.key, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, response.data?.key, Toast.LENGTH_SHORT).show()
             }
 
             override fun onFail(e: Throwable?) {
                 super.onFail(e)
                 AlertDialog.Builder(this@MainActivity)
-                    .setMessage(e!!.message)
+                    .setMessage(e?.message)
                     .setNegativeButton("确定") { dialog, _ -> dialog.dismiss() }.show()
             }
         })
@@ -251,7 +251,7 @@ open class MainActivity : HttpActivity() {
             }
 
             override fun onFail(e: Throwable?) {
-                rxUpLoadListener.onFail(e!!.message)
+                rxUpLoadListener.onFail(e?.message)
             }
 
             override fun onComplete() {
@@ -292,11 +292,11 @@ open class MainActivity : HttpActivity() {
 
     private val rxUpLoadListener: UpLoadCallBack = object : UpLoadCallBack() {
         override fun onStart() {
-            progressBarHorizontal!!.progress = 0
+            progressBarHorizontal?.progress = 0
         }
 
         override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
-            progressBarHorizontal!!.progress = progress
+            progressBarHorizontal?.progress = progress
             Log.e(
                 "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
                         + bytesWritten + "，contentLength : " + contentLength
@@ -314,11 +314,11 @@ open class MainActivity : HttpActivity() {
 
     private val rxDownLoadListener: DownLoadCallBack = object : DownLoadCallBack() {
         override fun onStart() {
-            progressBarHorizontal!!.progress = 0
+            progressBarHorizontal?.progress = 0
         }
 
         override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
-            progressBarHorizontal!!.progress = progress
+            progressBarHorizontal?.progress = progress
             downLoadLength += bytesWritten
         }
 

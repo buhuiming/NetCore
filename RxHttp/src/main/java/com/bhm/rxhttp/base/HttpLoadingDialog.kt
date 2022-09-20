@@ -24,10 +24,10 @@ open class HttpLoadingDialog {
             val fm = builder.activity.supportFragmentManager
             showAgain =
                 if (!httpLoadingFragment!!.isAdded && null == fm.findFragmentByTag("default")) {
-                    httpLoadingFragment!!.show(fm, "default")
+                    httpLoadingFragment?.show(fm, "default")
                     false
                 } else {
-                    httpLoadingFragment!!.changDialogContent(builder)
+                    httpLoadingFragment?.changDialogContent(builder)
                     true
                 }
         }
@@ -43,10 +43,10 @@ open class HttpLoadingDialog {
 
     private fun cancelLoading(activity: Activity?) {
         if (null != httpLoadingFragment && !showAgain) {
-            if (null != activity && null != httpLoadingFragment!!.dialog && (activity
-                        == httpLoadingFragment!!.activity)
+            if (null != activity && null != httpLoadingFragment?.dialog && (activity
+                        == httpLoadingFragment?.activity)
             ) {
-                httpLoadingFragment!!.dismiss()
+                httpLoadingFragment?.dismiss()
                 httpLoadingFragment = null
             }
         }

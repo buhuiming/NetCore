@@ -77,13 +77,13 @@ class HttpBuilder(private val builder: Builder) {
 
     fun <T> createRequest(cla: Class<T>, host: String): T {
         if (builder.isShowDialog && null != builder.dialog) {
-            builder.dialog!!.showLoading(this)
+            builder.dialog?.showLoading(this)
         }
         return RetrofitHelper(this)
             .createRequest(cla, host)
     }
 
-    /** 上传请求
+    /** 文件上传、文件下载请求
      * @param cla
      * @param host 请求地址
      * @param listener
@@ -93,8 +93,8 @@ class HttpBuilder(private val builder: Builder) {
         if (null == listener) {
             throw NullPointerException("RxStreamCallBackImp(listener) can not be null!")
         }
-        if (builder.isShowDialog && null != builder.dialog) {
-            builder.dialog!!.showLoading(this)
+        if (builder.isShowDialog) {
+            builder.dialog?.showLoading(this)
         }
         this.listener = listener
         return RetrofitHelper(this)
@@ -133,7 +133,7 @@ class HttpBuilder(private val builder: Builder) {
     private fun <T> doBaseConsumer(callBack: CallBack<T>?, t: T) {
         callBack?.onSuccess(t)
         if (isShowDialog && null != dialog) {
-            dialog!!.dismissLoading(activity)
+            dialog?.dismissLoading(activity)
         }
     }
 
@@ -154,7 +154,7 @@ class HttpBuilder(private val builder: Builder) {
     private fun <T> doThrowableConsumer(callBack: CallBack<T>?, e: Throwable) {
         callBack?.onFail(e)
         if (isShowDialog && null != dialog) {
-            dialog!!.dismissLoading(activity)
+            dialog?.dismissLoading(activity)
         }
         if (isDefaultToast) {
             if (e is HttpException) {
@@ -200,9 +200,9 @@ class HttpBuilder(private val builder: Builder) {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ }) { throwable ->
                 if (null != listener) {
-                    listener!!.onFail(throwable.message)
+                    listener?.onFail(throwable.message)
                     if (null != builder.dialog && builder.isShowDialog) {
-                        builder.dialog!!.dismissLoading(builder.activity)
+                        builder.dialog?.dismissLoading(builder.activity)
                     }
                 }
                 builder.disposeManager?.removeDispose()
