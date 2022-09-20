@@ -1,7 +1,7 @@
 package com.bhm.rxhttp.core.interceptor
 
 import com.bhm.rxhttp.core.HttpBuilder
-import com.bhm.rxhttp.body.UpLoadRequestBody
+import com.bhm.rxhttp.body.UploadRequestBody
 import okhttp3.Interceptor
 
 /**
@@ -19,7 +19,7 @@ class UploadInterceptor {
             val build = request.newBuilder()
                 .method(
                     request.method,
-                    UpLoadRequestBody(request.body!!, builder)
+                    UploadRequestBody(request.body!!, builder)
                 )
                 .build()
             chain.proceed(build)

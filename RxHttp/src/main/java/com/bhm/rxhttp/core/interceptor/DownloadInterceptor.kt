@@ -1,6 +1,6 @@
 package com.bhm.rxhttp.core.interceptor
 
-import com.bhm.rxhttp.body.DownLoadResponseBody
+import com.bhm.rxhttp.body.DownloadResponseBody
 import com.bhm.rxhttp.core.HttpBuilder
 import okhttp3.Interceptor
 
@@ -14,7 +14,7 @@ class DownloadInterceptor {
         return Interceptor { chain: Interceptor.Chain ->
             val response = chain.proceed(chain.request())
             response.newBuilder().body(
-                DownLoadResponseBody(response.body!!, builder)
+                DownloadResponseBody(response.body!!, builder)
             ).build()
         }
     }

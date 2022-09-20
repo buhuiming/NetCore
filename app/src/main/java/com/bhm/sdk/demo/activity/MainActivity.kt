@@ -19,11 +19,12 @@ import com.bhm.sdk.demo.entity.UpLoadEntity
 import com.bhm.sdk.demo.http.HttpApi
 import com.bhm.sdk.demo.tools.Utils.getFile
 import com.bhm.rxhttp.base.HttpActivity
-import com.bhm.rxhttp.core.callback.CallBack
-import com.bhm.rxhttp.core.callback.DownLoadCallBack
-import com.bhm.rxhttp.core.callback.UpLoadCallBack
+import com.bhm.rxhttp.core.callback.CommonCallBack
 import com.bhm.rxhttp.base.HttpLoadingDialog.Companion.defaultDialog
 import com.bhm.rxhttp.core.HttpBuilder
+import com.bhm.rxhttp.core.callback.DownloadCallBack
+import com.bhm.rxhttp.core.callback.UploadCallBack
+import com.bhm.sdk.demo.tools.MyHttpLoadingDialog
 import com.tbruyelle.rxpermissions3.RxPermissions
 import io.reactivex.rxjava3.disposables.Disposable
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -127,18 +128,18 @@ open class MainActivity : HttpActivity() {
 
     private fun downLoad() {
         rxPermissions?.request(
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )?.subscribe { aBoolean ->
-                if (!aBoolean) {
-                    Toast.makeText(
-                        this@MainActivity, "无法获取权限，请在设置中授权",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    downLoadFile() //下载文件
-                }
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        )?.subscribe { aBoolean ->
+            if (!aBoolean) {
+                Toast.makeText(
+                    this@MainActivity, "无法获取权限，请在设置中授权",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                downLoadFile() //下载文件
             }
+        }
     }
 
     private fun doGet() {
@@ -159,7 +160,7 @@ open class MainActivity : HttpActivity() {
         val observable = builder
             .createRequest(HttpApi::class.java, "http://news-at.zhihu.com")
             .getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
-        builder.setCallBack(observable, object : CallBack<DoGetEntity>() {
+        builder.setCallBack(observable, object : CommonCallBack<DoGetEntity>() {
             override fun onSuccess(response: DoGetEntity) {
                 Log.i("MainActivity--> ", response.date!!)
                 Toast.makeText(this@MainActivity, response.date, Toast.LENGTH_SHORT).show()
@@ -174,7 +175,7 @@ open class MainActivity : HttpActivity() {
                 val observable1 = builder1
                     .createRequest(HttpApi::class.java, "http://news-at.zhihu.com")
                     .getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
-                builder1.setCallBack(observable1, object : CallBack<DoGetEntity>() {
+                builder1.setCallBack(observable1, object : CommonCallBack<DoGetEntity>() {
                     override fun onSuccess(response: DoGetEntity) {
                         Log.i("MainActivity--> ", response.date!!)
                         Toast.makeText(this@MainActivity, response.date, Toast.LENGTH_SHORT).show()
@@ -186,20 +187,19 @@ open class MainActivity : HttpActivity() {
 
     private fun doPost() {
         val builder = HttpBuilder.create(this)
-            .setLoadingDialog(defaultDialog)
-//          .setLoadingDialog(new MyLoadingDialog())
+          .setLoadingDialog(MyHttpLoadingDialog())
             .setDialogAttribute(
                 isShowDialog = true,
                 cancelable = false,
                 dialogDismissInterruptRequest = false
-            ) //.setHttpTimeOut()
+            )
             .setIsLogOutPut(true)
             .setIsDefaultToast(false)
             .build()
         val observable = builder
             .createRequest(HttpApi::class.java, "https://www.pgyer.com/")
             .getDataPost("963ca3d091ba71bdd8596994ad7549b5", "android")
-        builder.setCallBack(observable, object : CallBack<DoPostEntity>() {
+        builder.setCallBack(observable, object : CommonCallBack<DoPostEntity>() {
             override fun onSuccess(response: DoPostEntity) {
                 Log.i("MainActivity--> ", response.toString())
                 Toast.makeText(this@MainActivity, response.data?.key, Toast.LENGTH_SHORT).show()
@@ -229,33 +229,38 @@ open class MainActivity : HttpActivity() {
             .setIsDefaultToast(true)
             .build()
         val observable = builder
-            .createRequest(
-                HttpApi::class.java,
-                "https://upload.pgyer.com/",
-                rxUpLoadListener
-            ) //rxUpLoadListener不能为空
+            .createRequest(HttpApi::class.java, "https://upload.pgyer.com/",)
             .upload(
                 "8fa554a43b63bad477fd55e72839528e".toRequestBody("text/plain".toMediaTypeOrNull()),
                 "963ca3d091ba71bdd8596994ad7549b5".toRequestBody("text/plain".toMediaTypeOrNull()),
                 part
             )
-        up_Disposable = builder.setCallBack(observable, object : CallBack<UpLoadEntity>() {
+        builder.setUploadCallBack(observable, object : UploadCallBack<UpLoadEntity>() {
             override fun onStart(disposable: Disposable?) {
-                rxUpLoadListener.onStart()
+                up_Disposable = disposable
+                progressBarHorizontal?.progress = 0
+            }
+
+            override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
+                progressBarHorizontal?.progress = progress
+                Log.e(
+                    "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
+                            + bytesWritten + "，contentLength : " + contentLength
+                )
             }
 
             override fun onSuccess(response: UpLoadEntity) {
                 Log.i("MainActivity--> ", response.data?.appCreated?: "")
-                Toast.makeText(this@MainActivity, response.data?.appCreated, Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(this@MainActivity, response.data?.appCreated, Toast.LENGTH_SHORT).show()
             }
 
             override fun onFail(e: Throwable?) {
-                rxUpLoadListener.onFail(e?.message)
+                Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
             }
 
             override fun onComplete() {
-                rxUpLoadListener.onFinish()
+                Log.i("MainActivity--> ", "onFinishUpload")
+                Toast.makeText(this@MainActivity, "onFinishUpload", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -285,49 +290,30 @@ open class MainActivity : HttpActivity() {
             .setIsDefaultToast(true)
             .build()
         val observable = builder //域名随便填写,但必须以“/”为结尾
-            .createRequest(HttpApi::class.java, "http://s.downpp.com/", rxDownLoadListener)
+            .createRequest(HttpApi::class.java, "http://s.downpp.com/")
             .downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
-        down_Disposable = builder.beginDownLoad(observable)
-    }
+        builder.setDownloadCallBack(observable, object : DownloadCallBack(){
+            override fun onStart(disposable: Disposable?) {
+                down_Disposable = disposable
+                progressBarHorizontal?.progress = 0
+            }
 
-    private val rxUpLoadListener: UpLoadCallBack = object : UpLoadCallBack() {
-        override fun onStart() {
-            progressBarHorizontal?.progress = 0
-        }
+            override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
+                progressBarHorizontal?.progress = progress
+                downLoadLength += bytesWritten
+                Log.e(
+                    "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
+                            + bytesWritten + "，contentLength : " + contentLength
+                )
+            }
 
-        override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
-            progressBarHorizontal?.progress = progress
-            Log.e(
-                "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
-                        + bytesWritten + "，contentLength : " + contentLength
-            )
-        }
+            override fun onFail(e: Throwable?) {
+                Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
+            }
 
-        override fun onFinish() {
-            Toast.makeText(this@MainActivity, "onFinishUpload", Toast.LENGTH_SHORT).show()
-        }
-
-        override fun onFail(errorInfo: String?) {
-            Toast.makeText(this@MainActivity, errorInfo, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private val rxDownLoadListener: DownLoadCallBack = object : DownLoadCallBack() {
-        override fun onStart() {
-            progressBarHorizontal?.progress = 0
-        }
-
-        override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
-            progressBarHorizontal?.progress = progress
-            downLoadLength += bytesWritten
-        }
-
-        override fun onFinish() {
-            Toast.makeText(this@MainActivity, "onFinishDownload", Toast.LENGTH_SHORT).show()
-        }
-
-        override fun onFail(errorInfo: String?) {
-            Toast.makeText(this@MainActivity, errorInfo, Toast.LENGTH_SHORT).show()
-        }
+            override fun onComplete() {
+                Toast.makeText(this@MainActivity, "onFinishDownload", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 }

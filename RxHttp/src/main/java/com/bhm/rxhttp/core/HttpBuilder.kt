@@ -7,8 +7,7 @@ import com.bhm.rxhttp.core.HttpConfig.Companion.cancelable
 import com.bhm.rxhttp.core.HttpConfig.Companion.httpLoadingDialog
 import com.bhm.rxhttp.core.HttpConfig.Companion.writtenLength
 import com.bhm.rxhttp.core.DisposeManager.Companion.rxSchedulerHelper
-import com.bhm.rxhttp.core.callback.CallBack
-import com.bhm.rxhttp.core.callback.StreamCallBackImp
+import com.bhm.rxhttp.core.callback.CallBackImp
 import com.bhm.rxhttp.define.ResultException
 import com.bhm.rxhttp.base.HttpLoadingDialog
 import com.bhm.rxhttp.define.CommonUtil.logger
@@ -32,11 +31,11 @@ import java.util.concurrent.TimeoutException
  */
 @Suppress("unused")
 class HttpBuilder(private val builder: Builder) {
-    var listener: StreamCallBackImp? = null
-        private set
     private var currentRequestDateTamp: Long = 0
     val activity: HttpActivity
         get() = builder.activity
+    var callBack: CallBackImp<*>? = null
+        private set
     val isShowDialog: Boolean
         get() = builder.isShowDialog
     val isLogOutPut: Boolean
@@ -83,25 +82,11 @@ class HttpBuilder(private val builder: Builder) {
             .createRequest(cla, host)
     }
 
-    /** 文件上传、文件下载请求
-     * @param cla
-     * @param host 请求地址
-     * @param listener
-     * @return
-     */
-    fun <T> createRequest(cla: Class<T>, host: String, listener: StreamCallBackImp?): T {
-        if (null == listener) {
-            throw NullPointerException("RxStreamCallBackImp(listener) can not be null!")
-        }
-        if (builder.isShowDialog) {
-            builder.dialog?.showLoading(this)
-        }
-        this.listener = listener
-        return RetrofitHelper(this)
-            .createRequest(cla, host)
-    }
-
-    fun <T: Any> setCallBack(observable: Observable<T>, callBack: CallBack<T>?): Disposable {
+    /*
+    *  设置请求回调
+    */
+    fun <T: Any> setCallBack(observable: Observable<T>, callBack: CallBackImp<T>?): Disposable {
+        this.callBack = callBack
         val disposable = observable.compose(builder.activity.bindToLifecycle()) //管理生命周期
             .compose(rxSchedulerHelper()) //发布事件io线程
             .subscribe(
@@ -117,8 +102,36 @@ class HttpBuilder(private val builder: Builder) {
         return disposable
     }
 
+    /*
+    *  设置上传文件回调
+    */
+    fun <T: Any> setUploadCallBack(observable: Observable<T>, callBack: CallBackImp<T>?): Disposable {
+        return this.setCallBack(observable, callBack)
+    }
+
+    /*
+    *  设置文件下载回调
+    */
+    fun <T: Any> setDownloadCallBack(observable: Observable<ResponseBody>, callBack: CallBackImp<T>?): Disposable {
+        this.callBack = callBack
+        val disposable = observable.subscribeOn(Schedulers.io())
+            .unsubscribeOn(Schedulers.io())
+            .map { responseBody -> responseBody.byteStream() }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({}) { throwable ->
+                callBack?.onFail(throwable)
+                if (null != builder.dialog && builder.isShowDialog) {
+                    builder.dialog?.dismissLoading(builder.activity)
+                }
+                builder.disposeManager?.removeDispose()
+            }
+        callBack?.onStart(disposable)
+        builder.disposeManager?.add(disposable)
+        return disposable
+    }
+
     @SuppressLint("CheckResult")
-    private fun <T: Any> getBaseConsumer(callBack: CallBack<T>?): Consumer<T> {
+    private fun <T: Any> getBaseConsumer(callBack: CallBackImp<T>?): Consumer<T> {
         return Consumer { t ->
             if (System.currentTimeMillis() - currentRequestDateTamp <= delaysProcessLimitTime) {
                 Observable.timer(delaysProcessLimitTime, TimeUnit.MILLISECONDS)
@@ -130,7 +143,7 @@ class HttpBuilder(private val builder: Builder) {
         }
     }
 
-    private fun <T> doBaseConsumer(callBack: CallBack<T>?, t: T) {
+    private fun <T: Any> doBaseConsumer(callBack: CallBackImp<T>?, t: T) {
         callBack?.onSuccess(t)
         if (isShowDialog && null != dialog) {
             dialog?.dismissLoading(activity)
@@ -138,7 +151,7 @@ class HttpBuilder(private val builder: Builder) {
     }
 
     @SuppressLint("CheckResult")
-    private fun <T> getThrowableConsumer(callBack: CallBack<T>?): Consumer<Throwable> {
+    private fun <T: Any> getThrowableConsumer(callBack: CallBackImp<T>?): Consumer<Throwable> {
         return Consumer { e ->
             logger(this@HttpBuilder, "ThrowableConsumer-> ", e.message) //抛异常
             if (System.currentTimeMillis() - currentRequestDateTamp <= delaysProcessLimitTime) {
@@ -151,7 +164,7 @@ class HttpBuilder(private val builder: Builder) {
         }
     }
 
-    private fun <T> doThrowableConsumer(callBack: CallBack<T>?, e: Throwable) {
+    private fun <T: Any> doThrowableConsumer(callBack: CallBackImp<T>?, e: Throwable) {
         callBack?.onFail(e)
         if (isShowDialog && null != dialog) {
             dialog?.dismissLoading(activity)
@@ -183,7 +196,7 @@ class HttpBuilder(private val builder: Builder) {
     /** 最终结果的处理
      * @return 和getThrowableConsumer互斥
      */
-    private fun <T> getDefaultAction(callBack: CallBack<T>?): Action {
+    private fun <T: Any> getDefaultAction(callBack: CallBackImp<T>?): Action {
         return Action { callBack?.onComplete() }
     }
 
@@ -192,24 +205,6 @@ class HttpBuilder(private val builder: Builder) {
      */
     private val disposableContainer: DisposableContainer
         get() = CompositeDisposable()
-
-    fun beginDownLoad(observable: Observable<ResponseBody>): Disposable {
-        val disposable = observable.subscribeOn(Schedulers.io())
-            .unsubscribeOn(Schedulers.io())
-            .map { responseBody -> responseBody.byteStream() }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ }) { throwable ->
-                if (null != listener) {
-                    listener?.onFail(throwable.message)
-                    if (null != builder.dialog && builder.isShowDialog) {
-                        builder.dialog?.dismissLoading(builder.activity)
-                    }
-                }
-                builder.disposeManager?.removeDispose()
-            }
-        builder.disposeManager?.add(disposable)
-        return disposable
-    }
 
     class Builder(val activity: HttpActivity) {
         internal var disposeManager: DisposeManager? = activity.disposeManager
