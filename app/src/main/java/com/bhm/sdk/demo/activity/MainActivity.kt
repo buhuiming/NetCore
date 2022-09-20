@@ -22,6 +22,7 @@ import com.bhm.rxhttp.base.HttpActivity
 import com.bhm.rxhttp.core.callback.CommonCallBack
 import com.bhm.rxhttp.base.HttpLoadingDialog.Companion.defaultDialog
 import com.bhm.rxhttp.core.HttpBuilder
+import com.bhm.rxhttp.core.RetrofitHelper
 import com.bhm.rxhttp.core.callback.DownloadCallBack
 import com.bhm.rxhttp.core.callback.UploadCallBack
 import com.bhm.sdk.demo.tools.MyHttpLoadingDialog
@@ -157,10 +158,10 @@ open class MainActivity : HttpActivity() {
         val builder = HttpBuilder.create(this)
             .setLoadingDialog(defaultDialog)
             .build()
-        val observable = builder
+        val observable = RetrofitHelper(builder)
             .createRequest(HttpApi::class.java, "http://news-at.zhihu.com")
             .getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
-        builder.setCallBack(observable, object : CommonCallBack<DoGetEntity>() {
+        builder.enqueue(observable, object : CommonCallBack<DoGetEntity>() {
             override fun onSuccess(response: DoGetEntity) {
                 Log.i("MainActivity--> ", response.date!!)
                 Toast.makeText(this@MainActivity, response.date, Toast.LENGTH_SHORT).show()
@@ -172,10 +173,10 @@ open class MainActivity : HttpActivity() {
                     .setLoadingDialog(defaultDialog)
                     .setLoadingTitle("dsadasd")
                     .build()
-                val observable1 = builder1
+                val observable1 = RetrofitHelper(builder)
                     .createRequest(HttpApi::class.java, "http://news-at.zhihu.com")
                     .getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
-                builder1.setCallBack(observable1, object : CommonCallBack<DoGetEntity>() {
+                builder1.enqueue(observable1, object : CommonCallBack<DoGetEntity>() {
                     override fun onSuccess(response: DoGetEntity) {
                         Log.i("MainActivity--> ", response.date!!)
                         Toast.makeText(this@MainActivity, response.date, Toast.LENGTH_SHORT).show()
@@ -196,10 +197,10 @@ open class MainActivity : HttpActivity() {
             .setIsLogOutPut(true)
             .setIsDefaultToast(false)
             .build()
-        val observable = builder
+        val observable = RetrofitHelper(builder)
             .createRequest(HttpApi::class.java, "https://www.pgyer.com/")
             .getDataPost("963ca3d091ba71bdd8596994ad7549b5", "android")
-        builder.setCallBack(observable, object : CommonCallBack<DoPostEntity>() {
+        builder.enqueue(observable, object : CommonCallBack<DoPostEntity>() {
             override fun onSuccess(response: DoPostEntity) {
                 Log.i("MainActivity--> ", response.toString())
                 Toast.makeText(this@MainActivity, response.data?.key, Toast.LENGTH_SHORT).show()
@@ -228,14 +229,14 @@ open class MainActivity : HttpActivity() {
             .setIsLogOutPut(true) //默认是false
             .setIsDefaultToast(true)
             .build()
-        val observable = builder
+        val observable = RetrofitHelper(builder)
             .createRequest(HttpApi::class.java, "https://upload.pgyer.com/",)
             .upload(
                 "8fa554a43b63bad477fd55e72839528e".toRequestBody("text/plain".toMediaTypeOrNull()),
                 "963ca3d091ba71bdd8596994ad7549b5".toRequestBody("text/plain".toMediaTypeOrNull()),
                 part
             )
-        builder.setUploadCallBack(observable, object : UploadCallBack<UpLoadEntity>() {
+        builder.uploadEnqueue(observable, object : UploadCallBack<UpLoadEntity>() {
             override fun onStart(disposable: Disposable?) {
                 up_Disposable = disposable
                 progressBarHorizontal?.progress = 0
@@ -289,10 +290,10 @@ open class MainActivity : HttpActivity() {
             .setIsLogOutPut(true)
             .setIsDefaultToast(true)
             .build()
-        val observable = builder //域名随便填写,但必须以“/”为结尾
+        val observable = RetrofitHelper(builder) //域名随便填写,但必须以“/”为结尾
             .createRequest(HttpApi::class.java, "http://s.downpp.com/")
             .downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
-        builder.setDownloadCallBack(observable, object : DownloadCallBack(){
+        builder.downloadEnqueue(observable, object : DownloadCallBack(){
             override fun onStart(disposable: Disposable?) {
                 down_Disposable = disposable
                 progressBarHorizontal?.progress = 0

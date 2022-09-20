@@ -14,6 +14,9 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 class RetrofitHelper(private val builder: HttpBuilder) {
 
     fun <T> createRequest(clazz: Class<T>, url: String): T {
+        if (builder.isShowDialog && null != builder.dialog) {
+            builder.dialog?.showLoading(builder)
+        }
         val retrofit = Retrofit.Builder()
             .baseUrl(url)
             .client(GenerateOkHttpClient().make(builder))

@@ -74,18 +74,10 @@ class HttpBuilder(private val builder: Builder) {
     private val delaysProcessLimitTime: Long
         get() = builder.delaysProcessLimitTime
 
-    fun <T> createRequest(cla: Class<T>, host: String): T {
-        if (builder.isShowDialog && null != builder.dialog) {
-            builder.dialog?.showLoading(this)
-        }
-        return RetrofitHelper(this)
-            .createRequest(cla, host)
-    }
-
     /*
     *  设置请求回调
     */
-    fun <T: Any> setCallBack(observable: Observable<T>, callBack: CallBackImp<T>?): Disposable {
+    fun <T: Any> enqueue(observable: Observable<T>, callBack: CallBackImp<T>?): Disposable {
         this.callBack = callBack
         val disposable = observable.compose(builder.activity.bindToLifecycle()) //管理生命周期
             .compose(rxSchedulerHelper()) //发布事件io线程
@@ -105,14 +97,14 @@ class HttpBuilder(private val builder: Builder) {
     /*
     *  设置上传文件回调
     */
-    fun <T: Any> setUploadCallBack(observable: Observable<T>, callBack: CallBackImp<T>?): Disposable {
-        return this.setCallBack(observable, callBack)
+    fun <T: Any> uploadEnqueue(observable: Observable<T>, callBack: CallBackImp<T>?): Disposable {
+        return this.enqueue(observable, callBack)
     }
 
     /*
     *  设置文件下载回调
     */
-    fun <T: Any> setDownloadCallBack(observable: Observable<ResponseBody>, callBack: CallBackImp<T>?): Disposable {
+    fun <T: Any> downloadEnqueue(observable: Observable<ResponseBody>, callBack: CallBackImp<T>?): Disposable {
         this.callBack = callBack
         val disposable = observable.subscribeOn(Schedulers.io())
             .unsubscribeOn(Schedulers.io())
