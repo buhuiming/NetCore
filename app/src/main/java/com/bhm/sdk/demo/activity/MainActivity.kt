@@ -25,8 +25,11 @@ import com.bhm.rxhttp.core.HttpBuilder
 import com.bhm.rxhttp.core.RetrofitHelper
 import com.bhm.rxhttp.core.callback.DownloadCallBack
 import com.bhm.rxhttp.core.callback.UploadCallBack
+import com.bhm.rxhttp.core.callback.HttpCall
+import com.bhm.rxhttp.core.RequestManager
 import com.bhm.sdk.demo.tools.MyHttpLoadingDialog
 import com.tbruyelle.rxpermissions3.RxPermissions
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -34,6 +37,7 @@ import okhttp3.MultipartBody.Part.Companion.createFormData
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
 import java.io.File
 
 @Suppress("PrivatePropertyName")
@@ -98,6 +102,7 @@ open class MainActivity : HttpActivity() {
             3 -> disposeManager.removeDispose(up_Disposable)
             4 -> {
                 downLoadLength = 0
+                progressBarHorizontal?.progress = 0
                 downLoad()
             }
             5 -> {
@@ -153,42 +158,34 @@ open class MainActivity : HttpActivity() {
                 .setIsLogOutPut(true)//默认是false
                 .setIsDefaultToast(true, getRxManager())
                 .build();*/
-
-        /*默认使用Application的配置*/
-        val builder = HttpBuilder.create(this)
-            .setLoadingDialog(defaultDialog)
-            .build()
-        val observable = RetrofitHelper(builder)
-            .createRequest(HttpApi::class.java, "http://news-at.zhihu.com")
-            .getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
-        builder.enqueue(observable, object : CommonCallBack<DoGetEntity>() {
-            override fun onSuccess(response: DoGetEntity) {
-                Log.i("MainActivity--> ", response.date!!)
-                Toast.makeText(this@MainActivity, response.date, Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onFail(e: Throwable?) {
-                super.onFail(e)
-                val builder1 = HttpBuilder.create(this@MainActivity)
-                    .setLoadingDialog(defaultDialog)
-                    .setLoadingTitle("dsadasd")
-                    .build()
-                val observable1 = RetrofitHelper(builder)
-                    .createRequest(HttpApi::class.java, "http://news-at.zhihu.com")
-                    .getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
-                builder1.enqueue(observable1, object : CommonCallBack<DoGetEntity>() {
+        RequestManager.builder()
+            .callManager<DoGetEntity>()
+            .setHttpBuilder(HttpBuilder.getDefaultBuilder(this))//默认使用Application的配置
+            .setBaseUrl("http://news-at.zhihu.com")
+            .httpCall(HttpApi::class.java,
+                object : HttpCall<DoGetEntity, HttpApi> {
+                    override fun callHttp(api: HttpApi): Observable<DoGetEntity> {
+                        return api.getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
+                    }
+                })
+            .execute(
+                object : CommonCallBack<DoGetEntity>() {
                     override fun onSuccess(response: DoGetEntity) {
                         Log.i("MainActivity--> ", response.date!!)
                         Toast.makeText(this@MainActivity, response.date, Toast.LENGTH_SHORT).show()
                     }
-                })
-            }
-        })
+
+                    override fun onFail(e: Throwable?) {
+                        super.onFail(e)
+                        Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            )
     }
 
     private fun doPost() {
-        val builder = HttpBuilder.create(this)
-          .setLoadingDialog(MyHttpLoadingDialog())
+        val httpBuilder = HttpBuilder.create(this)
+            .setLoadingDialog(MyHttpLoadingDialog())
             .setDialogAttribute(
                 isShowDialog = true,
                 cancelable = false,
@@ -197,22 +194,31 @@ open class MainActivity : HttpActivity() {
             .setIsLogOutPut(true)
             .setIsDefaultToast(false)
             .build()
-        val observable = RetrofitHelper(builder)
-            .createRequest(HttpApi::class.java, "https://www.pgyer.com/")
-            .getDataPost("963ca3d091ba71bdd8596994ad7549b5", "android")
-        builder.enqueue(observable, object : CommonCallBack<DoPostEntity>() {
-            override fun onSuccess(response: DoPostEntity) {
-                Log.i("MainActivity--> ", response.toString())
-                Toast.makeText(this@MainActivity, response.data?.key, Toast.LENGTH_SHORT).show()
-            }
+        RequestManager.builder()
+            .callManager<DoPostEntity>()
+            .setHttpBuilder(httpBuilder)
+            .setBaseUrl("https://www.pgyer.com/")
+            .httpCall(HttpApi::class.java,
+                object : HttpCall<DoPostEntity, HttpApi> {
+                    override fun callHttp(api: HttpApi): Observable<DoPostEntity> {
+                        return api.getDataPost("963ca3d091ba71bdd8596994ad7549b5", "android")
+                    }
+                })
+            .execute(
+                object : CommonCallBack<DoPostEntity>() {
+                    override fun onSuccess(response: DoPostEntity) {
+                        Log.i("MainActivity--> ", response.toString())
+                        Toast.makeText(this@MainActivity, response.data?.key, Toast.LENGTH_SHORT).show()
+                    }
 
-            override fun onFail(e: Throwable?) {
-                super.onFail(e)
-                AlertDialog.Builder(this@MainActivity)
-                    .setMessage(e?.message)
-                    .setNegativeButton("确定") { dialog, _ -> dialog.dismiss() }.show()
-            }
-        })
+                    override fun onFail(e: Throwable?) {
+                        super.onFail(e)
+                        AlertDialog.Builder(this@MainActivity)
+                            .setMessage(e?.message)
+                            .setNegativeButton("确定") { dialog, _ -> dialog.dismiss() }.show()
+                    }
+                }
+            )
     }
 
     private fun upLoadFile() {
@@ -229,41 +235,48 @@ open class MainActivity : HttpActivity() {
             .setIsLogOutPut(true) //默认是false
             .setIsDefaultToast(true)
             .build()
-        val observable = RetrofitHelper(builder)
-            .createRequest(HttpApi::class.java, "https://upload.pgyer.com/",)
-            .upload(
-                "8fa554a43b63bad477fd55e72839528e".toRequestBody("text/plain".toMediaTypeOrNull()),
-                "963ca3d091ba71bdd8596994ad7549b5".toRequestBody("text/plain".toMediaTypeOrNull()),
-                part
-            )
-        builder.uploadEnqueue(observable, object : UploadCallBack<UpLoadEntity>() {
-            override fun onStart(disposable: Disposable?) {
-                up_Disposable = disposable
-                progressBarHorizontal?.progress = 0
-            }
+        RequestManager.builder()
+            .callManager<UpLoadEntity>()
+            .setHttpBuilder(builder)
+            .setBaseUrl("https://upload.pgyer.com/")
+            .uploadCall(HttpApi::class.java,
+                object : HttpCall<UpLoadEntity, HttpApi> {
+                    override fun callHttp(api: HttpApi): Observable<UpLoadEntity> {
+                        return api.upload(
+                            "8fa554a43b63bad477fd55e72839528e".toRequestBody("text/plain".toMediaTypeOrNull()),
+                            "963ca3d091ba71bdd8596994ad7549b5".toRequestBody("text/plain".toMediaTypeOrNull()),
+                            part
+                        )
+                    }
+                })
+            .uploadExecute(object : UploadCallBack<UpLoadEntity>() {
+                override fun onStart(disposable: Disposable?) {
+                    up_Disposable = disposable
+                    progressBarHorizontal?.progress = 0
+                }
 
-            override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
-                progressBarHorizontal?.progress = progress
-                Log.e(
-                    "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
-                            + bytesWritten + "，contentLength : " + contentLength
-                )
-            }
+                override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
+                    progressBarHorizontal?.progress = progress
+                    Log.e(
+                        "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
+                                + bytesWritten + "，contentLength : " + contentLength
+                    )
+                }
 
-            override fun onSuccess(response: UpLoadEntity) {
-                Log.i("MainActivity--> ", response.data?.appCreated?: "")
-                Toast.makeText(this@MainActivity, response.data?.appCreated, Toast.LENGTH_SHORT).show()
-            }
+                override fun onSuccess(response: UpLoadEntity) {
+                    Log.i("MainActivity--> ", response.data?.appCreated?: "")
+                    Toast.makeText(this@MainActivity, response.data?.appCreated, Toast.LENGTH_SHORT).show()
+                }
 
-            override fun onFail(e: Throwable?) {
-                Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
-            }
+                override fun onFail(e: Throwable?) {
+                    Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
+                }
 
-            override fun onComplete() {
-                Log.i("MainActivity--> ", "onFinishUpload")
-                Toast.makeText(this@MainActivity, "onFinishUpload", Toast.LENGTH_SHORT).show()
-            }
-        })
+                override fun onComplete() {
+                    Log.i("MainActivity--> ", "onFinishUpload")
+                    Toast.makeText(this@MainActivity, "onFinishUpload", Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 
     /**
@@ -290,31 +303,39 @@ open class MainActivity : HttpActivity() {
             .setIsLogOutPut(true)
             .setIsDefaultToast(true)
             .build()
-        val observable = RetrofitHelper(builder) //域名随便填写,但必须以“/”为结尾
-            .createRequest(HttpApi::class.java, "http://s.downpp.com/")
-            .downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
-        builder.downloadEnqueue(observable, object : DownloadCallBack(){
-            override fun onStart(disposable: Disposable?) {
-                down_Disposable = disposable
-                progressBarHorizontal?.progress = 0
-            }
+        RequestManager.builder()
+            .callManager<ResponseBody>()
+            .setHttpBuilder(builder)
+            .setBaseUrl("http://s.downpp.com/")
+            .downloadCall(HttpApi::class.java,
+                object : HttpCall<ResponseBody, HttpApi> {
+                    override fun callHttp(api: HttpApi): Observable<ResponseBody> {
+                        return api.downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
+                    }
+                }
+            )
+            .downloadExecute(
+                object : DownloadCallBack(){
+                    override fun onStart(disposable: Disposable?) {
+                        down_Disposable = disposable
+                    }
 
-            override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
-                progressBarHorizontal?.progress = progress
-                downLoadLength += bytesWritten
-                Log.e(
-                    "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
-                            + bytesWritten + "，contentLength : " + contentLength
-                )
-            }
+                    override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
+                        progressBarHorizontal?.progress = progress
+                        downLoadLength += bytesWritten
+                        Log.e(
+                            "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
+                                    + bytesWritten + "，contentLength : " + contentLength
+                        )
+                    }
 
-            override fun onFail(e: Throwable?) {
-                Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
-            }
+                    override fun onFail(e: Throwable?) {
+                        Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
+                    }
 
-            override fun onComplete() {
-                Toast.makeText(this@MainActivity, "onFinishDownload", Toast.LENGTH_SHORT).show()
-            }
-        })
+                    override fun onComplete() {
+                        Toast.makeText(this@MainActivity, "onFinishDownload", Toast.LENGTH_SHORT).show()
+                    }
+                })
     }
 }

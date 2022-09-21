@@ -297,5 +297,12 @@ class HttpBuilder(private val builder: Builder) {
         fun create(activity: HttpActivity): Builder {
             return Builder(activity)
         }
+
+        @JvmStatic
+        fun getDefaultBuilder(activity: HttpActivity): HttpBuilder {
+            return create(activity)
+                .setLoadingDialog(HttpLoadingDialog.defaultDialog)
+                .build()
+        }
     }
 }

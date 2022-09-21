@@ -31,7 +31,7 @@ class GsonResponseBodyConverter<T> internal constructor(
                     httpResult.data = null
                     gson.fromJson<T>(gson.toJson(httpResult), type)
                 } else {
-                    throw ResultException(httpResult.code, httpResult.msg, response)
+                    throw ResultException(httpResult.code, httpResult.msg?: response, response)
                 }
             }
         } else if (httpResult.code == 0 && httpResult.ret == 0) {
@@ -40,11 +40,11 @@ class GsonResponseBodyConverter<T> internal constructor(
                 gson.fromJson<T>(response, type)
             } catch (e: Exception) {
                 //抛一个自定义ResultException 传入失败时候的状态码，和信息
-                throw ResultException(httpResult.code, httpResult.msg, response)
+                throw ResultException(httpResult.code, httpResult.msg?: response, response)
             }
         } else {
             //抛一个自定义ResultException 传入失败时候的状态码，和信息
-            throw ResultException(httpResult.code, httpResult.msg, response)
+            throw ResultException(httpResult.code, httpResult.msg?: response, response)
         }
     }
 }
