@@ -12,24 +12,21 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bhm.netcore.R
+import com.bhm.rxhttp.base.HttpActivity
+import com.bhm.rxhttp.base.HttpLoadingDialog.Companion.defaultDialog
+import com.bhm.rxhttp.core.HttpBuilder
+import com.bhm.rxhttp.core.RequestManager
+import com.bhm.rxhttp.core.callback.CommonCallBack
+import com.bhm.rxhttp.core.callback.DownloadCallBack
+import com.bhm.rxhttp.core.callback.UploadCallBack
 import com.bhm.sdk.demo.adapter.MainUIAdapter
 import com.bhm.sdk.demo.entity.DoGetEntity
 import com.bhm.sdk.demo.entity.DoPostEntity
 import com.bhm.sdk.demo.entity.UpLoadEntity
 import com.bhm.sdk.demo.http.HttpApi
-import com.bhm.sdk.demo.tools.Utils.getFile
-import com.bhm.rxhttp.base.HttpActivity
-import com.bhm.rxhttp.core.callback.CommonCallBack
-import com.bhm.rxhttp.base.HttpLoadingDialog.Companion.defaultDialog
-import com.bhm.rxhttp.core.HttpBuilder
-import com.bhm.rxhttp.core.RetrofitHelper
-import com.bhm.rxhttp.core.callback.DownloadCallBack
-import com.bhm.rxhttp.core.callback.UploadCallBack
-import com.bhm.rxhttp.core.callback.HttpCall
-import com.bhm.rxhttp.core.RequestManager
 import com.bhm.sdk.demo.tools.MyHttpLoadingDialog
+import com.bhm.sdk.demo.tools.Utils.getFile
 import com.tbruyelle.rxpermissions3.RxPermissions
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -162,12 +159,9 @@ open class MainActivity : HttpActivity() {
             .callManager<DoGetEntity>()
             .setHttpBuilder(HttpBuilder.getDefaultBuilder(this))//默认使用Application的配置
             .setBaseUrl("http://news-at.zhihu.com")
-            .httpCall(HttpApi::class.java,
-                object : HttpCall<DoGetEntity, HttpApi> {
-                    override fun callHttp(api: HttpApi): Observable<DoGetEntity> {
-                        return api.getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
-                    }
-                })
+            .httpCall(HttpApi::class.java) {
+                it.getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
+            }
             .execute(
                 object : CommonCallBack<DoGetEntity>() {
                     override fun onSuccess(response: DoGetEntity) {
@@ -198,12 +192,9 @@ open class MainActivity : HttpActivity() {
             .callManager<DoPostEntity>()
             .setHttpBuilder(httpBuilder)
             .setBaseUrl("https://www.pgyer.com/")
-            .httpCall(HttpApi::class.java,
-                object : HttpCall<DoPostEntity, HttpApi> {
-                    override fun callHttp(api: HttpApi): Observable<DoPostEntity> {
-                        return api.getDataPost("963ca3d091ba71bdd8596994ad7549b5", "android")
-                    }
-                })
+            .httpCall(HttpApi::class.java) {
+                it.getDataPost("963ca3d091ba71bdd8596994ad7549b5", "android")
+            }
             .execute(
                 object : CommonCallBack<DoPostEntity>() {
                     override fun onSuccess(response: DoPostEntity) {
@@ -239,16 +230,12 @@ open class MainActivity : HttpActivity() {
             .callManager<UpLoadEntity>()
             .setHttpBuilder(builder)
             .setBaseUrl("https://upload.pgyer.com/")
-            .uploadCall(HttpApi::class.java,
-                object : HttpCall<UpLoadEntity, HttpApi> {
-                    override fun callHttp(api: HttpApi): Observable<UpLoadEntity> {
-                        return api.upload(
-                            "8fa554a43b63bad477fd55e72839528e".toRequestBody("text/plain".toMediaTypeOrNull()),
-                            "963ca3d091ba71bdd8596994ad7549b5".toRequestBody("text/plain".toMediaTypeOrNull()),
-                            part
-                        )
-                    }
-                })
+            .uploadCall(HttpApi::class.java) {
+                it.upload(
+                    "8fa554a43b63bad477fd55e72839528e".toRequestBody("text/plain".toMediaTypeOrNull()),
+                    "963ca3d091ba71bdd8596994ad7549b5".toRequestBody("text/plain".toMediaTypeOrNull()),
+                    part)
+            }
             .uploadExecute(object : UploadCallBack<UpLoadEntity>() {
                 override fun onStart(disposable: Disposable?) {
                     up_Disposable = disposable
@@ -307,13 +294,9 @@ open class MainActivity : HttpActivity() {
             .callManager<ResponseBody>()
             .setHttpBuilder(builder)
             .setBaseUrl("http://s.downpp.com/")
-            .downloadCall(HttpApi::class.java,
-                object : HttpCall<ResponseBody, HttpApi> {
-                    override fun callHttp(api: HttpApi): Observable<ResponseBody> {
-                        return api.downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
-                    }
-                }
-            )
+            .downloadCall(HttpApi::class.java) {
+                it.downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
+            }
             .downloadExecute(
                 object : DownloadCallBack(){
                     override fun onStart(disposable: Disposable?) {

@@ -1,9 +1,7 @@
 package com.bhm.rxhttp.core
 
-import com.bhm.rxhttp.base.HttpActivity
 import com.bhm.rxhttp.core.callback.CallBackImp
 import com.bhm.rxhttp.core.callback.DownloadCallBack
-import com.bhm.rxhttp.core.callback.HttpCall
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import okhttp3.ResponseBody
@@ -55,19 +53,19 @@ class RequestManager private constructor() {
             return this
         }
 
-        fun <T : Any> httpCall(aClass: Class<T>, call: HttpCall<E, T>): Manager<E> {
+        fun <T : Any> httpCall(aClass: Class<T>, httpCall:(T) -> Observable<E>): Manager<E> {
             val api = RetrofitHelper(httpBuilder!!).createRequest(aClass, baseUrl!!)
-            observable = call.callHttp(api)
+            observable = httpCall(api)
             return this
         }
 
-        fun <T : Any> uploadCall(aClass: Class<T>, call: HttpCall<E, T>): Manager<E> {
-            return this.httpCall(aClass, call)
+        fun <T : Any> uploadCall(aClass: Class<T>, httpCall:(T) -> Observable<E>): Manager<E> {
+            return this.httpCall(aClass, httpCall)
         }
 
-        fun <T : Any> downloadCall(aClass: Class<T>, call: HttpCall<ResponseBody, T>): Manager<E> {
+        fun <T : Any> downloadCall(aClass: Class<T>, httpCall:(T) -> Observable<ResponseBody>): Manager<E> {
             val api = RetrofitHelper(httpBuilder!!).createRequest(aClass, baseUrl!!)
-            downloadObservable = call.callHttp(api)
+            downloadObservable = httpCall(api)
             return this
         }
 
