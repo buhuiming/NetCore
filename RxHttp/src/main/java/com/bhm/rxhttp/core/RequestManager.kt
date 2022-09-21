@@ -55,17 +55,17 @@ class RequestManager private constructor() {
             return this
         }
 
-        fun <T> httpCall(aClass: Class<T>, call: HttpCall<E, T>): Manager<E> {
+        fun <T : Any> httpCall(aClass: Class<T>, call: HttpCall<E, T>): Manager<E> {
             val api = RetrofitHelper(httpBuilder!!).createRequest(aClass, baseUrl!!)
             observable = call.callHttp(api)
             return this
         }
 
-        fun <T> uploadCall(aClass: Class<T>, call: HttpCall<E, T>): Manager<E> {
+        fun <T : Any> uploadCall(aClass: Class<T>, call: HttpCall<E, T>): Manager<E> {
             return this.httpCall(aClass, call)
         }
 
-        fun <T> downloadCall(aClass: Class<T>, call: HttpCall<ResponseBody, T>): Manager<E> {
+        fun <T : Any> downloadCall(aClass: Class<T>, call: HttpCall<ResponseBody, T>): Manager<E> {
             val api = RetrofitHelper(httpBuilder!!).createRequest(aClass, baseUrl!!)
             downloadObservable = call.callHttp(api)
             return this
