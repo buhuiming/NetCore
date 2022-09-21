@@ -24,4 +24,3 @@
 ### TO DO
 
 #### 1、优化生命周期管理的方式
-#### 2、优化CallBack方式为suspendCoroutine

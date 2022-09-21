@@ -163,6 +163,7 @@ open class MainActivity : HttpActivity() {
                 it.getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
             }
             .execute(
+                //可以继承CallBackImp，重写方法，比如在onFail中处理401，404等
                 object : CommonCallBack<DoGetEntity>() {
                     override fun onSuccess(response: DoGetEntity) {
                         Log.i("MainActivity--> ", response.date!!)
