@@ -54,23 +54,6 @@ open class MainActivity : HttpActivity() {
         rxPermissions = RxPermissions(this) //权限申请
         initView()
         initListener()
-        Test.test{
-            testMethod1 {
-
-            }
-            testMethod2 {
-                return@testMethod2 0
-            }
-            testMethod3 {
-
-            }
-            testMethod4 {
-                return@testMethod4 ""
-            }
-            testMethod5 {
-                return@testMethod5 ""
-            }
-        }
     }
 
     private fun initView() {
@@ -179,20 +162,16 @@ open class MainActivity : HttpActivity() {
             .httpCall(HttpApi::class.java) {
                 it.getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
             }
-            .execute(
+            .execute {
                 //可以继承CallBackImp，重写方法，比如在onFail中处理401，404等
-                object : CommonCallBack<DoGetEntity>() {
-                    override fun onSuccess(response: DoGetEntity) {
-                        Log.i("MainActivity--> ", response.date!!)
-                        Toast.makeText(this@MainActivity, response.date, Toast.LENGTH_SHORT).show()
-                    }
-
-                    override fun onFail(e: Throwable?) {
-                        super.onFail(e)
-                        Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
-                    }
+                success { response ->
+                    Log.i("MainActivity--> ", response.date!!)
+                    Toast.makeText(this@MainActivity, response.date, Toast.LENGTH_SHORT).show()
                 }
-            )
+                fail { e ->
+                    Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private fun doPost() {
@@ -213,21 +192,17 @@ open class MainActivity : HttpActivity() {
             .httpCall(HttpApi::class.java) {
                 it.getDataPost("963ca3d091ba71bdd8596994ad7549b5", "android")
             }
-            .execute(
-                object : CommonCallBack<DoPostEntity>() {
-                    override fun onSuccess(response: DoPostEntity) {
-                        Log.i("MainActivity--> ", response.toString())
-                        Toast.makeText(this@MainActivity, response.data?.key, Toast.LENGTH_SHORT).show()
-                    }
-
-                    override fun onFail(e: Throwable?) {
-                        super.onFail(e)
-                        AlertDialog.Builder(this@MainActivity)
-                            .setMessage(e?.message)
-                            .setNegativeButton("确定") { dialog, _ -> dialog.dismiss() }.show()
-                    }
+            .execute {
+                success { response ->
+                    Log.i("MainActivity--> ", response.toString())
+                    Toast.makeText(this@MainActivity, response.data?.key, Toast.LENGTH_SHORT).show()
                 }
-            )
+                fail { e ->
+                    AlertDialog.Builder(this@MainActivity)
+                        .setMessage(e?.message)
+                        .setNegativeButton("确定") { dialog, _ -> dialog.dismiss() }.show()
+                }
+            }
     }
 
     private fun upLoadFile() {
@@ -254,34 +229,30 @@ open class MainActivity : HttpActivity() {
                     "963ca3d091ba71bdd8596994ad7549b5".toRequestBody("text/plain".toMediaTypeOrNull()),
                     part)
             }
-            .uploadExecute(object : UploadCallBack<UpLoadEntity>() {
-                override fun onStart(disposable: Disposable?) {
+            .uploadExecute {
+                start { disposable ->
                     up_Disposable = disposable
                     progressBarHorizontal?.progress = 0
                 }
-
-                override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
+                progress { progress, bytesWritten, contentLength ->
                     progressBarHorizontal?.progress = progress
                     Log.e(
                         "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
                                 + bytesWritten + "，contentLength : " + contentLength
                     )
                 }
-
-                override fun onSuccess(response: UpLoadEntity) {
+                success { response ->
                     Log.i("MainActivity--> ", response.data?.appCreated?: "")
                     Toast.makeText(this@MainActivity, response.data?.appCreated, Toast.LENGTH_SHORT).show()
                 }
-
-                override fun onFail(e: Throwable?) {
+                fail { e ->
                     Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
                 }
-
-                override fun onComplete() {
+                complete {
                     Log.i("MainActivity--> ", "onFinishUpload")
                     Toast.makeText(this@MainActivity, "onFinishUpload", Toast.LENGTH_SHORT).show()
                 }
-            })
+            }
     }
 
     /**
@@ -315,28 +286,25 @@ open class MainActivity : HttpActivity() {
             .downloadCall(HttpApi::class.java) {
                 it.downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
             }
-            .downloadExecute(
-                object : DownloadCallBack(){
-                    override fun onStart(disposable: Disposable?) {
-                        down_Disposable = disposable
-                    }
-
-                    override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
-                        progressBarHorizontal?.progress = progress
-                        downLoadLength += bytesWritten
-                        Log.e(
-                            "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
-                                    + bytesWritten + "，contentLength : " + contentLength
-                        )
-                    }
-
-                    override fun onFail(e: Throwable?) {
-                        Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
-                    }
-
-                    override fun onComplete() {
-                        Toast.makeText(this@MainActivity, "onFinishDownload", Toast.LENGTH_SHORT).show()
-                    }
-                })
+            .downloadExecute {
+                start { disposable ->
+                    down_Disposable = disposable
+                }
+                progress { progress, bytesWritten, contentLength ->
+                    progressBarHorizontal?.progress = progress
+                    downLoadLength += bytesWritten
+                    Log.e(
+                        "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
+                                + bytesWritten + "，contentLength : " + contentLength
+                    )
+                }
+                fail { e ->
+                    Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
+                }
+                complete {
+                    Log.i("MainActivity--> ", "onFinishDownload")
+                    Toast.makeText(this@MainActivity, "onFinishDownload", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 }

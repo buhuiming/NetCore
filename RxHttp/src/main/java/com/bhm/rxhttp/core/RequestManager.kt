@@ -1,7 +1,9 @@
 package com.bhm.rxhttp.core
 
 import com.bhm.rxhttp.core.callback.CallBackImp
+import com.bhm.rxhttp.core.callback.CommonCallBack
 import com.bhm.rxhttp.core.callback.DownloadCallBack
+import com.bhm.rxhttp.core.callback.UploadCallBack
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import okhttp3.ResponseBody
@@ -69,16 +71,22 @@ class RequestManager private constructor() {
             return this
         }
 
-        fun execute(callBack: CallBackImp<E>?): Disposable? {
-            return httpBuilder?.enqueue(observable!!, callBack)
+        fun execute(callBack: CommonCallBack<E>.() -> Unit): Disposable? {
+            val call = CommonCallBack<E>()
+            call.apply(callBack)
+            return httpBuilder?.enqueue(observable!!, call)
         }
 
-        fun uploadExecute(callBack: CallBackImp<E>?): Disposable? {
-            return this.execute(callBack)
+        fun uploadExecute(callBack: UploadCallBack<E>.() -> Unit): Disposable? {
+            val call = UploadCallBack<E>()
+            call.apply(callBack)
+            return httpBuilder?.enqueue(observable!!, call)
         }
 
-        fun downloadExecute(callBack: DownloadCallBack): Disposable? {
-            return httpBuilder?.downloadEnqueue(downloadObservable!!, callBack)
+        fun downloadExecute(callBack: DownloadCallBack.() -> Unit): Disposable? {
+            val call = DownloadCallBack()
+            call.apply(callBack)
+            return httpBuilder?.downloadEnqueue(downloadObservable!!, call)
         }
     }
 }
