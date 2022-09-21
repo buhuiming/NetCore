@@ -54,6 +54,23 @@ open class MainActivity : HttpActivity() {
         rxPermissions = RxPermissions(this) //权限申请
         initView()
         initListener()
+        Test.test{
+            testMethod1 {
+
+            }
+            testMethod2 {
+                return@testMethod2 0
+            }
+            testMethod3 {
+
+            }
+            testMethod4 {
+                return@testMethod4 ""
+            }
+            testMethod5 {
+                return@testMethod5 ""
+            }
+        }
     }
 
     private fun initView() {
