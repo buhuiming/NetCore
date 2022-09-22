@@ -2,9 +2,20 @@
 
 ### 用法
 
-#### 1、Activity继承HttpActivity，Fragment继承HttpFragment，DialogFragment继承HttpDialogFragment
+        allprojects {
+            repositories {
+                ...
+                maven { url 'https://jitpack.io' }
+            }
+        }
 
-#### 2、Application配置默认的Rx配置项
+        dependencies {
+            implementation 'com.github.buhuiming:Netcore:1.0.0'
+        }
+
+#### 1、Activity继承HttpActivity，Fragment继承HttpFragment，DialogFragment继承HttpDialogFragment (实现内存管理)
+
+#### 2、Application配置默认的全局配置项
         HttpConfig.create()
             .setLoadingDialog(MyLoadingDialog())
             .setDialogAttribute(
@@ -41,4 +52,4 @@
 
 ### TO DO
 
-#### 1、优化生命周期管理的方式
+#### 1、
