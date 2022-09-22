@@ -1,6 +1,5 @@
 package com.bhm.rxhttp.core
 
-import com.bhm.rxhttp.core.callback.CallBackImp
 import com.bhm.rxhttp.core.callback.CommonCallBack
 import com.bhm.rxhttp.core.callback.DownloadCallBack
 import com.bhm.rxhttp.core.callback.UploadCallBack
