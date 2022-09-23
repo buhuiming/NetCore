@@ -16,9 +16,6 @@ import com.bhm.rxhttp.base.HttpActivity
 import com.bhm.rxhttp.base.HttpLoadingDialog.Companion.defaultDialog
 import com.bhm.rxhttp.core.HttpBuilder
 import com.bhm.rxhttp.core.RequestManager
-import com.bhm.rxhttp.core.callback.CommonCallBack
-import com.bhm.rxhttp.core.callback.DownloadCallBack
-import com.bhm.rxhttp.core.callback.UploadCallBack
 import com.bhm.sdk.demo.adapter.MainUIAdapter
 import com.bhm.sdk.demo.entity.DoGetEntity
 import com.bhm.sdk.demo.entity.DoPostEntity

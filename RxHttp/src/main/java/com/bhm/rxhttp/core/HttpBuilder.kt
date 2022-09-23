@@ -79,7 +79,8 @@ class HttpBuilder(private val builder: Builder) {
     */
     fun <T: Any> enqueue(observable: Observable<T>, callBack: CallBackImp<T>?): Disposable {
         this.callBack = callBack
-        val disposable = observable.compose(builder.activity.bindToLifecycle()) //管理生命周期
+        val disposable = observable
+            .compose(builder.activity.bindToLifecycle()) //管理生命周期
             .compose(rxSchedulerHelper()) //发布事件io线程
             .subscribe(
                 getBaseConsumer(callBack),
@@ -106,7 +107,9 @@ class HttpBuilder(private val builder: Builder) {
     */
     fun <T: Any> downloadEnqueue(observable: Observable<ResponseBody>, callBack: CallBackImp<T>?): Disposable {
         this.callBack = callBack
-        val disposable = observable.subscribeOn(Schedulers.io())
+        val disposable = observable
+            .compose(builder.activity.bindToLifecycle()) //管理生命周期
+            .subscribeOn(Schedulers.io())
             .unsubscribeOn(Schedulers.io())
             .map { responseBody -> responseBody.byteStream() }
             .observeOn(AndroidSchedulers.mainThread())

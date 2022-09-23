@@ -32,11 +32,18 @@ class UploadRequestBody(private val mRequestBody: RequestBody, private val httpB
 
     @Throws(IOException::class)
     override fun writeTo(sink: BufferedSink) {
-        val bufferedSink: BufferedSink
-        val mCountingSink = CountingSink(sink)
-        bufferedSink = mCountingSink.buffer()
-        mRequestBody.writeTo(bufferedSink)
-        bufferedSink.flush()
+        if (sink is Buffer
+            || sink.toString().contains(
+                "com.android.tools.profiler.support.network.HttpTracker\$OutputStreamTracker")) {
+            mRequestBody.writeTo(sink);
+        } else {
+            val bufferedSink: BufferedSink
+            val mCountingSink = CountingSink(sink)
+            bufferedSink = mCountingSink.buffer()
+            mRequestBody.writeTo(bufferedSink)
+            bufferedSink.flush()
+            bufferedSink.close()
+        }
     }
 
     internal inner class CountingSink(delegate: Sink?) : ForwardingSink(delegate!!) {

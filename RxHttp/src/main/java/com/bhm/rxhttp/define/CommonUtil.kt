@@ -42,7 +42,7 @@ object CommonUtil {
     fun deleteFile(httpBuilder: HttpBuilder, contentLength: Long) {
         val file = checkFile(httpBuilder)
         if (file.exists()) {
-            if (!httpBuilder.isAppendWrite || file.length() >= contentLength) {
+            if (!httpBuilder.isAppendWrite || file.length() >= contentLength || httpBuilder.writtenLength() == 0L) {
                 file.delete()
             }
         }
