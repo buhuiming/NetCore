@@ -3,17 +3,17 @@ package com.bhm.rxhttp.core
 import android.annotation.SuppressLint
 import android.widget.Toast
 import com.bhm.rxhttp.base.HttpActivity
+import com.bhm.rxhttp.base.HttpLoadingDialog
 import com.bhm.rxhttp.core.HttpConfig.Companion.cancelable
 import com.bhm.rxhttp.core.HttpConfig.Companion.httpLoadingDialog
 import com.bhm.rxhttp.core.HttpConfig.Companion.writtenLength
-import com.bhm.rxhttp.core.DisposeManager.Companion.rxSchedulerHelper
 import com.bhm.rxhttp.core.callback.CallBackImp
-import com.bhm.rxhttp.define.ResultException
-import com.bhm.rxhttp.base.HttpLoadingDialog
 import com.bhm.rxhttp.define.CommonUtil.logger
+import com.bhm.rxhttp.define.ResultException
 import com.google.gson.JsonSyntaxException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.ObservableTransformer
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.disposables.DisposableContainer
@@ -306,6 +306,18 @@ class HttpBuilder(private val builder: Builder) {
             return create(activity)
                 .setLoadingDialog(HttpLoadingDialog.defaultDialog)
                 .build()
+        }
+
+        /**
+         * 统一线程处理
+         * 发布事件io线程，接收事件主线程
+         */
+        @JvmStatic
+        private fun <T : Any> rxSchedulerHelper(): ObservableTransformer<T, T> { //compose处理线程
+            return ObservableTransformer { upstream ->
+                upstream.subscribeOn(Schedulers.io()) //读写文件、读写数据库、网络信息交互等
+                    .observeOn(AndroidSchedulers.mainThread()) //指定的是它之后的操作所在的线程。
+            }
         }
     }
 }

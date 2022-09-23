@@ -1,11 +1,7 @@
 package com.bhm.rxhttp.core
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.ObservableTransformer
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.ArrayList
 
 /**
  * Created by bhm on 2022/9/15.
@@ -59,19 +55,5 @@ class DisposeManager {
 
     fun isExitDispose(disposable: Disposable): Boolean {
         return null != list && list!!.contains(disposable)
-    }
-
-    companion object {
-        /**
-         * 统一线程处理
-         * 发布事件io线程，接收事件主线程
-         */
-        @JvmStatic
-        fun <T : Any> rxSchedulerHelper(): ObservableTransformer<T, T> { //compose处理线程
-            return ObservableTransformer { upstream ->
-                upstream.subscribeOn(Schedulers.io()) //读写文件、读写数据库、网络信息交互等
-                    .observeOn(AndroidSchedulers.mainThread()) //指定的是它之后的操作所在的线程。
-            }
-        }
     }
 }
