@@ -8,7 +8,7 @@ import com.trello.rxlifecycle4.components.support.RxDialogFragment
 /**
  * Created by bhm on 2022/9/15.
  */
-class HttpDialogFragment : RxDialogFragment() {
+open class HttpDialogFragment : RxDialogFragment() {
 
     private var activity: RxAppCompatActivity? = null
 
