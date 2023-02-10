@@ -79,7 +79,7 @@ class RequestManager private constructor() {
         fun uploadExecute(callBack: UploadCallBack<E>.() -> Unit): Disposable? {
             val call = UploadCallBack<E>()
             call.apply(callBack)
-            return httpBuilder?.enqueue(observable!!, call)
+            return httpBuilder?.uploadEnqueue(observable!!, call)
         }
 
         fun downloadExecute(callBack: DownloadCallBack.() -> Unit): Disposable? {

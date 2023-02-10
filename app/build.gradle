@@ -39,4 +39,6 @@ dependencies {
     //permissions
     implementation 'com.github.tbruyelle:rxpermissions:0.12'
     implementation project(path: ':RxHttp')
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.10'
 }

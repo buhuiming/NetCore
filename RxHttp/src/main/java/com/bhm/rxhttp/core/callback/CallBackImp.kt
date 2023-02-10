@@ -8,7 +8,6 @@ import io.reactivex.rxjava3.disposables.Disposable
  */
 interface CallBackImp<T> {
     fun onStart(disposable: Disposable?)
-    fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long)
     fun onSuccess(response: T)
     fun onFail(e: Throwable?)
     fun onComplete()

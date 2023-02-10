@@ -10,8 +10,6 @@ open class CommonCallBack<T> : CallBackImp<T> {
 
     private var _start: ((disposable: Disposable?) -> Unit)? = null
 
-    private var _progress: ((progress: Int, bytesWritten: Long, contentLength: Long) -> Unit)? = null
-
     private var _success: ((response: T) -> Unit)? = null
 
     private var _fail: ((e: Throwable?) -> Unit)? = null
@@ -20,10 +18,6 @@ open class CommonCallBack<T> : CallBackImp<T> {
 
     fun start(value: (disposable: Disposable?) -> Unit) {
         _start = value
-    }
-
-    fun progress(value: (progress: Int, bytesWritten: Long, contentLength: Long) -> Unit) {
-        _progress = value
     }
 
     fun success(value: (response: T) -> Unit) {
@@ -40,10 +34,6 @@ open class CommonCallBack<T> : CallBackImp<T> {
 
     override fun onStart(disposable: Disposable?) {
         _start?.invoke(disposable)
-    }
-
-    override fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long) {
-        _progress?.invoke(progress, bytesWritten, contentLength)
     }
 
     override fun onSuccess(response: T) {
