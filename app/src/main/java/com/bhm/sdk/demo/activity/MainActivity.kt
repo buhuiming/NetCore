@@ -180,6 +180,7 @@ open class MainActivity : HttpActivity() {
                 dialogDismissInterruptRequest = false
             )
             .setIsLogOutPut(true)
+            .setSpecifiedTimeoutMillis(1000)
             .setIsDefaultToast(false)
             .build()
         RequestManager.builder()
@@ -198,6 +199,9 @@ open class MainActivity : HttpActivity() {
                     AlertDialog.Builder(this@MainActivity)
                         .setMessage(e?.message)
                         .setNegativeButton("确定") { dialog, _ -> dialog.dismiss() }.show()
+                }
+                specifiedTimeout {
+                    Log.i("MainActivity--> ", "请求超过1s还没有完成")
                 }
             }
     }
@@ -274,6 +278,7 @@ open class MainActivity : HttpActivity() {
             )
             .setDownLoadFileAtr(filePath, fileName, true, downLoadLength)
             .setIsLogOutPut(true)
+            .setSpecifiedTimeoutMillis(2000)
             .setIsDefaultToast(true)
             .build()
         RequestManager.builder()
@@ -301,6 +306,9 @@ open class MainActivity : HttpActivity() {
                 complete {
                     Log.i("MainActivity--> ", "onFinishDownload")
                     Toast.makeText(this@MainActivity, "onFinishDownload", Toast.LENGTH_SHORT).show()
+                }
+                specifiedTimeout {
+                    Log.i("MainActivity--> ", "请求超过2s还没有完成")
                 }
             }
     }

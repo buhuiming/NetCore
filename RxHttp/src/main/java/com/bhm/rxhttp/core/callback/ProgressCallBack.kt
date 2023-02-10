@@ -5,6 +5,6 @@ package com.bhm.rxhttp.core.callback
  * @description:进度回调
  * @date :2023/2/10 15:15
  */
-interface ProgressCallBack<T>: CallBackImp<T>{
-    fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long)
+abstract class ProgressCallBack<T>: SpecifiedTimeoutCallBack<T>() {
+    abstract fun onProgress(progress: Int, bytesWritten: Long, contentLength: Long)
 }

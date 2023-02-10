@@ -71,8 +71,10 @@ class HttpBuilder(private val builder: Builder) {
         get() = builder.loadingTitle
     val defaultHeader: HashMap<String, String>?
         get() = builder.defaultHeader
-    private val delaysProcessLimitTime: Long
-        get() = builder.delaysProcessLimitTime
+    private val delaysProcessLimitTimeMillis: Long
+        get() = builder.delaysProcessLimitTimeMillis
+    private val specifiedTimeoutMillis: Long
+        get() = builder.specifiedTimeoutMillis
 
     /*
     *  设置请求回调
@@ -90,7 +92,7 @@ class HttpBuilder(private val builder: Builder) {
             )
         currentRequestDateTamp = System.currentTimeMillis()
         //做准备工作
-        callBack?.onStart(disposable)
+        callBack?.onStart(disposable, specifiedTimeoutMillis)
         builder.disposeManager?.add(disposable)
         return disposable
     }
@@ -120,7 +122,7 @@ class HttpBuilder(private val builder: Builder) {
                 }
                 builder.disposeManager?.removeDispose()
             }
-        callBack?.onStart(disposable)
+        callBack?.onStart(disposable, specifiedTimeoutMillis)
         builder.disposeManager?.add(disposable)
         return disposable
     }
@@ -128,8 +130,8 @@ class HttpBuilder(private val builder: Builder) {
     @SuppressLint("CheckResult")
     private fun <T: Any> getBaseConsumer(callBack: CallBackImp<T>?): Consumer<T> {
         return Consumer { t ->
-            if (System.currentTimeMillis() - currentRequestDateTamp <= delaysProcessLimitTime) {
-                Observable.timer(delaysProcessLimitTime, TimeUnit.MILLISECONDS)
+            if (System.currentTimeMillis() - currentRequestDateTamp <= delaysProcessLimitTimeMillis) {
+                Observable.timer(delaysProcessLimitTimeMillis, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { doBaseConsumer(callBack, t) }
             } else {
@@ -149,8 +151,8 @@ class HttpBuilder(private val builder: Builder) {
     private fun <T: Any> getThrowableConsumer(callBack: CallBackImp<T>?): Consumer<Throwable> {
         return Consumer { e ->
             logger(this@HttpBuilder, "ThrowableConsumer-> ", e.message) //抛异常
-            if (System.currentTimeMillis() - currentRequestDateTamp <= delaysProcessLimitTime) {
-                Observable.timer(delaysProcessLimitTime, TimeUnit.MILLISECONDS)
+            if (System.currentTimeMillis() - currentRequestDateTamp <= delaysProcessLimitTimeMillis) {
+                Observable.timer(delaysProcessLimitTimeMillis, TimeUnit.MILLISECONDS)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe { doThrowableConsumer(callBack, e) }
             } else {
@@ -218,7 +220,8 @@ class HttpBuilder(private val builder: Builder) {
         internal var loadingTitle = HttpConfig.loadingTitle
         internal var isDialogDismissInterruptRequest = HttpConfig.isDialogDismissInterruptRequest
         internal var defaultHeader = HttpConfig.defaultHeader
-        internal var delaysProcessLimitTime = HttpConfig.delaysProcessLimitTime
+        internal var delaysProcessLimitTimeMillis = HttpConfig.delaysProcessLimitTimeMillis
+        internal var specifiedTimeoutMillis = HttpConfig.specifiedTimeoutMillis
 
         fun setLoadingDialog(dialog: HttpLoadingDialog?): Builder {
             this.dialog = dialog
@@ -285,8 +288,13 @@ class HttpBuilder(private val builder: Builder) {
             return this
         }
 
-        fun setDelaysProcessLimitTime(delaysProcessLimitTime1: Long): Builder {
-            delaysProcessLimitTime = delaysProcessLimitTime1
+        fun setDelaysProcessLimitTimeMillis(delaysProcessLimitTimeMillis: Long): Builder {
+            this.delaysProcessLimitTimeMillis = delaysProcessLimitTimeMillis
+            return this
+        }
+
+        fun setSpecifiedTimeoutMillis(specifiedTimeoutMillis: Long): Builder {
+            this.specifiedTimeoutMillis = specifiedTimeoutMillis
             return this
         }
 

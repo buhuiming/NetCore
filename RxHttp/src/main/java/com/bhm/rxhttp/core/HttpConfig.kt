@@ -25,7 +25,8 @@ class HttpConfig(builder: Builder) {
         internal var isAppendWrite = false
         internal var loadingTitle: String? = null
         internal var defaultHeader: HashMap<String, String>? = null
-        internal var delaysProcessLimitTime: Long = 0
+        internal var delaysProcessLimitTimeMillis: Long = 0
+        internal var specifiedTimeoutMillis: Long = 0
 
         fun setLoadingDialog(setDialog: HttpLoadingDialog?): Builder {
             dialog = setDialog
@@ -95,8 +96,13 @@ class HttpConfig(builder: Builder) {
             return this
         }
 
-        fun setDelaysProcessLimitTime(delaysProcessLimitTime1: Long): Builder {
-            delaysProcessLimitTime = delaysProcessLimitTime1
+        fun setDelaysProcessLimitTimeMillis(delaysProcessLimitTimeMillis: Long): Builder {
+            this.delaysProcessLimitTimeMillis = delaysProcessLimitTimeMillis
+            return this
+        }
+
+        fun setSpecifiedTimeoutMillis(specifiedTimeoutMillis: Long): Builder {
+            this.specifiedTimeoutMillis = specifiedTimeoutMillis
             return this
         }
 
@@ -150,7 +156,10 @@ class HttpConfig(builder: Builder) {
         var defaultHeader: HashMap<String, String>? = HashMap()
             private set
         @JvmStatic
-        var delaysProcessLimitTime: Long = 0 //请求有结果之后，延迟处理时间 单位毫秒
+        var delaysProcessLimitTimeMillis: Long = 0 //请求有结果之后，延迟处理时间 单位毫秒
+            private set
+        @JvmStatic
+        var specifiedTimeoutMillis: Long = 0 //指定超时，在规定的时间内没有结果(成功/失败)。用在提示用户网络环境不给力的情况
             private set
 
         @JvmStatic
@@ -185,6 +194,7 @@ class HttpConfig(builder: Builder) {
         loadingTitle = builder.loadingTitle
         isDialogDismissInterruptRequest = builder.dialogDismissInterruptRequest
         defaultHeader = builder.defaultHeader
-        delaysProcessLimitTime = builder.delaysProcessLimitTime
+        delaysProcessLimitTimeMillis = builder.delaysProcessLimitTimeMillis
+        specifiedTimeoutMillis = builder.specifiedTimeoutMillis
     }
 }

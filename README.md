@@ -27,7 +27,7 @@
             .isLogOutPut(true)
             .setReadTimeOut(30000)
             .setConnectTimeOut(30000)
-            .setDelaysProcessLimitTime(0) //请求成功/失败之后，再过0秒后去处理结果
+            .setDelaysProcessLimitTimeMillis(0) //请求成功/失败之后，再过0秒后去处理结果
             .setOkHttpClient(null)
             .build()
 #### 3、发起请求(参考demo MainActivity)

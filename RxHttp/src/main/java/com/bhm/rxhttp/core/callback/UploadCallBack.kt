@@ -6,7 +6,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 /** 事件执行的回调
  * Created by bhm on 2022/9/15.
  */
-open class UploadCallBack<T> : ProgressCallBack<T> {
+open class UploadCallBack<T> : ProgressCallBack<T>() {
 
     private var _start: ((disposable: Disposable?) -> Unit)? = null
 
@@ -38,7 +38,8 @@ open class UploadCallBack<T> : ProgressCallBack<T> {
         _complete = value
     }
 
-    override fun onStart(disposable: Disposable?) {
+    override fun onStart(disposable: Disposable?, specifiedTimeoutMillis: Long) {
+        super.onStart(disposable, specifiedTimeoutMillis)
         _start?.invoke(disposable)
     }
 
@@ -51,10 +52,12 @@ open class UploadCallBack<T> : ProgressCallBack<T> {
     }
 
     override fun onFail(e: Throwable?) {
+        super.onFail(e)
         _fail?.invoke(e)
     }
 
     override fun onComplete() {
+        super.onComplete()
         _complete?.invoke()
     }
 }
