@@ -162,7 +162,7 @@ open class MainActivity : HttpActivity() {
             .execute {
                 //可以继承CommonCallBack，重写方法，比如在onFail中处理401，404等
                 success { response ->
-                    Log.i("MainActivity--> ", response.date!!)
+                    Log.i(javaClass.name, response.date!!)
                     Toast.makeText(this@MainActivity, response.date, Toast.LENGTH_SHORT).show()
                 }
                 fail { e ->
@@ -192,7 +192,7 @@ open class MainActivity : HttpActivity() {
             }
             .execute {
                 success { response ->
-                    Log.i("MainActivity--> ", response.toString())
+                    Log.i(javaClass.name, response.toString())
                     Toast.makeText(this@MainActivity, response.data?.key, Toast.LENGTH_SHORT).show()
                 }
                 fail { e ->
@@ -201,7 +201,7 @@ open class MainActivity : HttpActivity() {
                         .setNegativeButton("确定") { dialog, _ -> dialog.dismiss() }.show()
                 }
                 specifiedTimeout {
-                    Log.i("MainActivity--> ", "请求超过1s还没有完成")
+                    Log.i(javaClass.name, "请求超过1s还没有完成")
                 }
             }
     }
@@ -243,14 +243,14 @@ open class MainActivity : HttpActivity() {
                     )
                 }
                 success { response ->
-                    Log.i("MainActivity--> ", response.data?.appCreated?: "")
+                    Log.i(javaClass.name, response.data?.appCreated?: "")
                     Toast.makeText(this@MainActivity, response.data?.appCreated, Toast.LENGTH_SHORT).show()
                 }
                 fail { e ->
                     Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
                 }
                 complete {
-                    Log.i("MainActivity--> ", "onFinishUpload")
+                    Log.i(javaClass.name, "onFinishUpload")
                     Toast.makeText(this@MainActivity, "onFinishUpload", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -304,11 +304,11 @@ open class MainActivity : HttpActivity() {
                     Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
                 }
                 complete {
-                    Log.i("MainActivity--> ", "onFinishDownload")
+                    Log.i(javaClass.name, "onFinishDownload")
                     Toast.makeText(this@MainActivity, "onFinishDownload", Toast.LENGTH_SHORT).show()
                 }
                 specifiedTimeout {
-                    Log.i("MainActivity--> ", "请求超过2s还没有完成")
+                    Log.i(javaClass.name, "请求超过2s还没有完成")
                 }
             }
     }

@@ -13,6 +13,12 @@ import okhttp3.Interceptor
  * @date :2022/9/16 16:55
  */
 class CacheInterceptor {
+
+    companion object {
+        const val USER_AGENT = "User-Agent"
+        const val ACCEPT_ENCODING = "Accept-Encoding"
+        const val CACHE_CONTROL = "Cache-Control"
+    }
     fun make(builder: HttpBuilder): Interceptor {
         return Interceptor { chain ->
             var request = chain.request()
@@ -20,32 +26,32 @@ class CacheInterceptor {
                 // 有网络时, 缓存5s，根据实际情况设置
                 val maxAge = 5
                 request = request.newBuilder()
-                    .removeHeader("User-Agent")
-                    .removeHeader("Accept-Encoding")
-                    .header("Accept-Encoding", "identity")
-                    .header("User-Agent", getUserAgent(builder.activity))
+                    .removeHeader(USER_AGENT)
+                    .removeHeader(ACCEPT_ENCODING)
+                    .header(ACCEPT_ENCODING, "identity")
+                    .header(USER_AGENT, getUserAgent(builder.activity))
                     .build()
                 val response = chain.proceed(request)
                 response.newBuilder()
                     .removeHeader("Pragma")
-                    .removeHeader("Cache-Control")
-                    .header("Cache-Control", "public, max-age=$maxAge")
+                    .removeHeader(CACHE_CONTROL)
+                    .header(CACHE_CONTROL, "public, max-age=$maxAge")
                     .build()
             } else {
                 // 无网络时，缓存为3天
                 val maxStale = 60 * 60 * 24 * 3
                 request = request.newBuilder()
                     .cacheControl(CacheControl.FORCE_CACHE)
-                    .removeHeader("User-Agent")
-                    .removeHeader("Accept-Encoding")
-                    .header("Accept-Encoding", "identity")
-                    .header("User-Agent", getUserAgent(builder.activity))
+                    .removeHeader(USER_AGENT)
+                    .removeHeader(ACCEPT_ENCODING)
+                    .header(ACCEPT_ENCODING, "identity")
+                    .header(USER_AGENT, getUserAgent(builder.activity))
                     .build()
                 val response = chain.proceed(request)
                 response.newBuilder()
                     .removeHeader("Pragma")
-                    .removeHeader("Cache-Control")
-                    .header("Cache-Control", "public, only-if-cached, max-stale=$maxStale")
+                    .removeHeader(CACHE_CONTROL)
+                    .header(CACHE_CONTROL, "public, only-if-cached, max-stale=$maxStale")
                     .build()
             }
         }

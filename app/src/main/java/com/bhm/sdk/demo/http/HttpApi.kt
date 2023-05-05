@@ -22,7 +22,7 @@ interface HttpApi {
     @FormUrlEncoded
     @POST("apiv2/app/getCOSToken")
     fun getDataPost(
-        @Field("_api_key") api_key: String?,
+        @Field("_api_key") apiKey: String?,
         @Field("buildType") buildType: String?
     ): Observable<DoPostEntity>
 
@@ -31,7 +31,7 @@ interface HttpApi {
     @POST("apiv1/app/upload")
     fun upload(
         @Part("uKey") uKey: RequestBody?,
-        @Part("_api_key") api_key: RequestBody?,
+        @Part("_api_key") apiKey: RequestBody?,
         @Part file: MultipartBody.Part
     ): Observable<UpLoadEntity>
 

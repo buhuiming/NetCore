@@ -42,13 +42,11 @@ open class HttpLoadingDialog {
     }
 
     private fun cancelLoading(activity: Activity?) {
-        if (null != httpLoadingFragment && !showAgain) {
-            if (null != activity && null != httpLoadingFragment?.dialog && (activity
-                        == httpLoadingFragment?.activity)
-            ) {
-                httpLoadingFragment?.dismiss()
-                httpLoadingFragment = null
-            }
+        if (null != httpLoadingFragment && !showAgain && null != activity && null != httpLoadingFragment?.dialog && (activity
+                    == httpLoadingFragment?.activity)
+        ) {
+            httpLoadingFragment?.dismiss()
+            httpLoadingFragment = null
         }
         showAgain = false
     }

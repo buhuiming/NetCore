@@ -41,10 +41,11 @@ object CommonUtil {
     @Throws(IOException::class)
     fun deleteFile(httpBuilder: HttpBuilder, contentLength: Long) {
         val file = checkFile(httpBuilder)
-        if (file.exists()) {
-            if (!httpBuilder.isAppendWrite || file.length() >= contentLength || httpBuilder.writtenLength() == 0L) {
-                file.delete()
-            }
+        if (!file.exists()) {
+            return
+        }
+        if (!httpBuilder.isAppendWrite || file.length() >= contentLength || httpBuilder.writtenLength() == 0L) {
+            file.delete()
         }
     }
 
