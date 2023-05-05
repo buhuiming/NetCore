@@ -17,3 +17,6 @@ class ResultException : IOException {
 }
 
 const val OK_CODE = 200 //成功返回的code
+const val MESSAGE_KEY = "message" //默认key
+const val CODE_KEY = "code" //默认key
+const val DATA_KEY = "data" //默认key

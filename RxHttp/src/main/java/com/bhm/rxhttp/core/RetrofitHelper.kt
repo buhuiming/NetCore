@@ -21,7 +21,7 @@ class RetrofitHelper(private val builder: HttpBuilder) {
             .baseUrl(url)
             .client(GenerateOkHttpClient().make(builder))
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-            .addConverterFactory(create(gsonBuilder))
+            .addConverterFactory(create(gsonBuilder, builder.messageKey, builder.codeKey, builder.dataKey, builder.successCode))
             .build()
         return retrofit.create(clazz)
     }

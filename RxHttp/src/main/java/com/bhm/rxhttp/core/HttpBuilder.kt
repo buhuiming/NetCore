@@ -8,8 +8,8 @@ import com.bhm.rxhttp.core.HttpConfig.Companion.cancelable
 import com.bhm.rxhttp.core.HttpConfig.Companion.httpLoadingDialog
 import com.bhm.rxhttp.core.HttpConfig.Companion.writtenLength
 import com.bhm.rxhttp.core.callback.CallBackImp
+import com.bhm.rxhttp.define.*
 import com.bhm.rxhttp.define.CommonUtil.logger
-import com.bhm.rxhttp.define.ResultException
 import com.google.gson.JsonSyntaxException
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -75,6 +75,14 @@ class HttpBuilder(private val builder: Builder) {
         get() = builder.delaysProcessLimitTimeMillis
     private val specifiedTimeoutMillis: Long
         get() = builder.specifiedTimeoutMillis
+    val messageKey: String
+        get() = builder.messageKey
+    val codeKey: String
+        get() = builder.codeKey
+    val dataKey: String
+        get() = builder.dataKey
+    val successCode: Int
+        get() = builder.successCode
 
     /*
     *  设置请求回调
@@ -222,32 +230,32 @@ class HttpBuilder(private val builder: Builder) {
         internal var defaultHeader = HttpConfig.defaultHeader
         internal var delaysProcessLimitTimeMillis = HttpConfig.delaysProcessLimitTimeMillis
         internal var specifiedTimeoutMillis = HttpConfig.specifiedTimeoutMillis
+        internal var messageKey = HttpConfig.messageKey
+        internal var codeKey = HttpConfig.codeKey
+        internal var dataKey = HttpConfig.dataKey
+        internal var successCode = HttpConfig.successCode
 
-        fun setLoadingDialog(dialog: HttpLoadingDialog?): Builder {
+        fun setLoadingDialog(dialog: HttpLoadingDialog?) = apply {
             this.dialog = dialog
-            return this
         }
 
         fun setDialogAttribute(
             isShowDialog: Boolean,
             cancelable: Boolean,
             dialogDismissInterruptRequest: Boolean
-        ): Builder {
+        ) = apply {
             this.isShowDialog = isShowDialog
             isCancelable = cancelable
             this.isDialogDismissInterruptRequest = dialogDismissInterruptRequest
-            return this
         }
 
-        fun setIsDefaultToast(isDefaultToast: Boolean): Builder {
+        fun setIsDefaultToast(isDefaultToast: Boolean) = apply {
             this.isDefaultToast = isDefaultToast
-            return this
         }
 
-        fun setHttpTimeOut(readTimeOut: Int, connectTimeOut: Int): Builder {
+        fun setHttpTimeOut(readTimeOut: Int, connectTimeOut: Int) = apply {
             this.readTimeOut = readTimeOut
             this.connectTimeOut = connectTimeOut
-            return this
         }
 
         /** 不推荐使用，使用此方法，将取消默认的设置，包括但不限于日志，缓存，下载，上传，网络，SSL。
@@ -255,24 +263,20 @@ class HttpBuilder(private val builder: Builder) {
          * @return
          */
         @Deprecated("")
-        fun setOkHttpClient(okHttpClient: OkHttpClient?): Builder {
+        fun setOkHttpClient(okHttpClient: OkHttpClient?) = apply {
             this.okHttpClient = okHttpClient
-            return this
         }
 
-        fun setIsLogOutPut(isLogOutPut: Boolean): Builder {
+        fun setIsLogOutPut(isLogOutPut: Boolean) = apply {
             this.isLogOutPut = isLogOutPut
-            return this
         }
 
-        fun setLoadingTitle(loadingTitle: String?): Builder {
+        fun setLoadingTitle(loadingTitle: String?) = apply {
             this.loadingTitle = loadingTitle
-            return this
         }
 
-        fun setDefaultHeader(defaultHeader: HashMap<String, String>?): Builder {
+        fun setDefaultHeader(defaultHeader: HashMap<String, String>?) = apply {
             this.defaultHeader = defaultHeader
-            return this
         }
 
         fun setDownLoadFileAtr(
@@ -280,22 +284,29 @@ class HttpBuilder(private val builder: Builder) {
             mFileName: String?,
             mAppendWrite: Boolean,
             mWrittenLength: Long
-        ): Builder {
+        ) = apply {
             filePath = mFilePath
             fileName = mFileName
             this.isAppendWrite = mAppendWrite
             writtenLength = mWrittenLength
-            return this
         }
 
-        fun setDelaysProcessLimitTimeMillis(delaysProcessLimitTimeMillis: Long): Builder {
+        fun setDelaysProcessLimitTimeMillis(delaysProcessLimitTimeMillis: Long) = apply {
             this.delaysProcessLimitTimeMillis = delaysProcessLimitTimeMillis
-            return this
         }
 
-        fun setSpecifiedTimeoutMillis(specifiedTimeoutMillis: Long): Builder {
+        fun setSpecifiedTimeoutMillis(specifiedTimeoutMillis: Long) = apply {
             this.specifiedTimeoutMillis = specifiedTimeoutMillis
-            return this
+        }
+
+        fun setJsonCovertKey(messageKey: String = MESSAGE_KEY,
+                             codeKey: String = CODE_KEY,
+                             dataKey: String = DATA_KEY,
+                             successCode: Int = OK_CODE) = apply {
+            this.messageKey = messageKey
+            this.codeKey = codeKey
+            this.dataKey = dataKey
+            this.successCode = successCode
         }
 
         fun build(): HttpBuilder {
@@ -305,9 +316,7 @@ class HttpBuilder(private val builder: Builder) {
 
     companion object {
         @JvmStatic
-        fun create(activity: HttpActivity): Builder {
-            return Builder(activity)
-        }
+        fun create(activity: HttpActivity) = Builder(activity)
 
         @JvmStatic
         fun getDefaultBuilder(activity: HttpActivity): HttpBuilder {

@@ -1,6 +1,10 @@
 package com.bhm.rxhttp.core
 
 import com.bhm.rxhttp.base.HttpLoadingDialog
+import com.bhm.rxhttp.define.CODE_KEY
+import com.bhm.rxhttp.define.DATA_KEY
+import com.bhm.rxhttp.define.MESSAGE_KEY
+import com.bhm.rxhttp.define.OK_CODE
 import okhttp3.OkHttpClient
 
 /**
@@ -27,60 +31,55 @@ class HttpConfig(builder: Builder) {
         internal var defaultHeader: HashMap<String, String>? = null
         internal var delaysProcessLimitTimeMillis: Long = 0
         internal var specifiedTimeoutMillis: Long = 0
+        internal var messageKey: String = MESSAGE_KEY
+        internal var codeKey: String = CODE_KEY
+        internal var dataKey: String = DATA_KEY
+        internal var successCode: Int = OK_CODE
 
-        fun setLoadingDialog(setDialog: HttpLoadingDialog?): Builder {
+        fun setLoadingDialog(setDialog: HttpLoadingDialog?) = apply {
             dialog = setDialog
-            return this
         }
 
         /** 不推荐使用，使用此方法，将取消默认的设置，包括但不限于日志，缓存，下载，上传，网络，SSL。
          * @param setOkHttpClient
          * @return
          */
-        fun setOkHttpClient(setOkHttpClient: OkHttpClient?): Builder {
+        fun setOkHttpClient(setOkHttpClient: OkHttpClient?) = apply {
             okHttpClient = setOkHttpClient
-            return this
         }
 
-        fun setConnectTimeOut(setConnectTimeOut: Int): Builder {
+        fun setConnectTimeOut(setConnectTimeOut: Int) = apply {
             connectTimeOut = setConnectTimeOut
-            return this
         }
 
-        fun setReadTimeOut(setReadTimeOut: Int): Builder {
+        fun setReadTimeOut(setReadTimeOut: Int) = apply {
             readTimeOut = setReadTimeOut
-            return this
         }
 
-        fun setDefaultHeader(defaultHeader: HashMap<String, String>?): Builder {
+        fun setDefaultHeader(defaultHeader: HashMap<String, String>?) = apply {
             this.defaultHeader = defaultHeader
-            return this
         }
 
         fun setDialogAttribute(
             isShowDialog: Boolean,
             cancelable: Boolean,
             dialogDismissInterruptRequest: Boolean
-        ): Builder {
+        ) = apply {
             this.isShowDialog = isShowDialog
             this.cancelable = cancelable
             this.dialogDismissInterruptRequest = dialogDismissInterruptRequest
-            return this
         }
 
-        fun isDefaultToast(defaultToast: Boolean): Builder {
+        fun isDefaultToast(defaultToast: Boolean) = apply {
             isDefaultToast = defaultToast
-            return this
         }
 
-        fun setLoadingTitle(loadingTitle: String?): Builder {
+        fun setLoadingTitle(loadingTitle: String?) = apply {
             this.loadingTitle = loadingTitle
-            return this
         }
 
-        fun isLogOutPut(logOutPut: Boolean): Builder {
+        fun isLogOutPut(logOutPut: Boolean) = apply {
             isLogOutPut = logOutPut
-            return this
         }
 
         fun setDownLoadFileAtr(
@@ -88,22 +87,29 @@ class HttpConfig(builder: Builder) {
             mFileName: String?,
             mIsAppendWrite: Boolean,
             mWrittenLength: Long
-        ): Builder {
+        ) = apply {
             filePath = mFilePath
             fileName = mFileName
             writtenLength = mWrittenLength
             isAppendWrite = mIsAppendWrite
-            return this
         }
 
-        fun setDelaysProcessLimitTimeMillis(delaysProcessLimitTimeMillis: Long): Builder {
+        fun setDelaysProcessLimitTimeMillis(delaysProcessLimitTimeMillis: Long) = apply {
             this.delaysProcessLimitTimeMillis = delaysProcessLimitTimeMillis
-            return this
         }
 
-        fun setSpecifiedTimeoutMillis(specifiedTimeoutMillis: Long): Builder {
+        fun setSpecifiedTimeoutMillis(specifiedTimeoutMillis: Long) = apply {
             this.specifiedTimeoutMillis = specifiedTimeoutMillis
-            return this
+        }
+
+        fun setJsonCovertKey(messageKey: String = MESSAGE_KEY,
+                             codeKey: String = CODE_KEY,
+                             dataKey: String = DATA_KEY,
+                             successCode: Int = OK_CODE) = apply {
+            this.messageKey = messageKey
+            this.codeKey = codeKey
+            this.dataKey = dataKey
+            this.successCode = successCode
         }
 
         fun build(): HttpConfig {
@@ -163,9 +169,23 @@ class HttpConfig(builder: Builder) {
             private set
 
         @JvmStatic
-        fun create(): Builder {
-            return Builder()
-        }
+        var messageKey: String = MESSAGE_KEY
+            private set
+
+        @JvmStatic
+        var codeKey: String = CODE_KEY
+            private set
+
+        @JvmStatic
+        var dataKey: String = DATA_KEY
+            private set
+
+        @JvmStatic
+        var successCode: Int = OK_CODE
+            private set
+
+        @JvmStatic
+        fun create() = Builder()
 
         @JvmStatic
         fun cancelable(): Boolean {
@@ -196,5 +216,9 @@ class HttpConfig(builder: Builder) {
         defaultHeader = builder.defaultHeader
         delaysProcessLimitTimeMillis = builder.delaysProcessLimitTimeMillis
         specifiedTimeoutMillis = builder.specifiedTimeoutMillis
+        messageKey = builder.messageKey
+        codeKey = builder.codeKey
+        dataKey = builder.dataKey
+        successCode = builder.successCode
     }
 }

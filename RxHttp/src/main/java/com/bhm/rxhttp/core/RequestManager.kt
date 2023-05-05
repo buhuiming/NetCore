@@ -44,30 +44,26 @@ class RequestManager private constructor() {
 
         private var downloadObservable: Observable<ResponseBody>? = null
 
-        fun setHttpBuilder(httpBuilder: HttpBuilder?): Manager<E> {
+        fun setHttpBuilder(httpBuilder: HttpBuilder?) = apply {
             this.httpBuilder = httpBuilder
-            return this
         }
 
-        fun setBaseUrl(url: String?): Manager<E> {
+        fun setBaseUrl(url: String?) = apply {
             baseUrl = url
-            return this
         }
 
-        fun <T : Any> httpCall(aClass: Class<T>, httpCall:(T) -> Observable<E>): Manager<E> {
+        fun <T : Any> httpCall(aClass: Class<T>, httpCall:(T) -> Observable<E>) = apply {
             val api = RetrofitHelper(httpBuilder!!).createRequest(aClass, baseUrl!!)
             observable = httpCall(api)
-            return this
         }
 
-        fun <T : Any> uploadCall(aClass: Class<T>, httpCall:(T) -> Observable<E>): Manager<E> {
-            return this.httpCall(aClass, httpCall)
+        fun <T : Any> uploadCall(aClass: Class<T>, httpCall:(T) -> Observable<E>) = apply {
+            this.httpCall(aClass, httpCall)
         }
 
-        fun <T : Any> downloadCall(aClass: Class<T>, httpCall:(T) -> Observable<ResponseBody>): Manager<E> {
+        fun <T : Any> downloadCall(aClass: Class<T>, httpCall:(T) -> Observable<ResponseBody>) = apply {
             val api = RetrofitHelper(httpBuilder!!).createRequest(aClass, baseUrl!!)
             downloadObservable = httpCall(api)
-            return this
         }
 
         fun execute(callBack: CommonCallBack<E>.() -> Unit): Disposable? {
