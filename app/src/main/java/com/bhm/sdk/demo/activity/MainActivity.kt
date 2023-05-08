@@ -12,10 +12,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bhm.netcore.R
-import com.bhm.rxhttp.base.HttpActivity
-import com.bhm.rxhttp.base.HttpLoadingDialog.Companion.defaultDialog
-import com.bhm.rxhttp.core.HttpBuilder
-import com.bhm.rxhttp.core.RequestManager
+import com.bhm.network.base.HttpActivity
+import com.bhm.network.base.HttpLoadingDialog.Companion.defaultDialog
+import com.bhm.network.core.HttpOptions
+import com.bhm.network.core.RequestManager
 import com.bhm.sdk.demo.adapter.MainUIAdapter
 import com.bhm.sdk.demo.entity.DoGetEntity
 import com.bhm.sdk.demo.entity.DoPostEntity
@@ -152,27 +152,30 @@ open class MainActivity : HttpActivity() {
                 .setIsLogOutPut(true)//默认是false
                 .setIsDefaultToast(true, getRxManager())
                 .build();*/
-        RequestManager.builder()
-            .callManager<DoGetEntity>()
-            .setHttpBuilder(HttpBuilder.getDefaultBuilder(this))//默认使用Application的配置
+        RequestManager.get()
+            .buildRequest<DoGetEntity>()
+            .setHttpOptions(HttpOptions.getDefaultHttpOptions(this))//默认使用Application的配置
             .setBaseUrl("http://news-at.zhihu.com")
-            .httpCall(HttpApi::class.java) {
-                it.getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
-            }
-            .execute {
-                //可以继承CommonCallBack，重写方法，比如在onFail中处理401，404等
-                success { response ->
-                    Log.i(javaClass.name, response.date!!)
-                    Toast.makeText(this@MainActivity, response.date, Toast.LENGTH_SHORT).show()
+            .execute(
+                HttpApi::class.java,
+                {
+                    it.getData("Bearer aedfc1246d0b4c3f046be2d50b34d6ff", "1")
+                },
+                {
+                    //可以继承CommonCallBack，重写方法，比如在onFail中处理401，404等
+                    success { response ->
+                        Log.i(javaClass.name, response.date!!)
+                        Toast.makeText(this@MainActivity, response.date, Toast.LENGTH_SHORT).show()
+                    }
+                    fail { e ->
+                        Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
+                    }
                 }
-                fail { e ->
-                    Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
-                }
-            }
+            )
     }
 
     private fun doPost() {
-        val httpBuilder = HttpBuilder.create(this)
+        val httpOptions = HttpOptions.create(this)
             .setLoadingDialog(MyHttpLoadingDialog())
             .setDialogAttribute(
                 isShowDialog = true,
@@ -183,34 +186,37 @@ open class MainActivity : HttpActivity() {
             .setSpecifiedTimeoutMillis(1000)
             .setIsDefaultToast(false)
             .build()
-        RequestManager.builder()
-            .callManager<DoPostEntity>()
-            .setHttpBuilder(httpBuilder)
+        RequestManager.get()
+            .buildRequest<DoPostEntity>()
+            .setHttpOptions(httpOptions)
             .setBaseUrl("https://www.pgyer.com/")
-            .httpCall(HttpApi::class.java) {
-                it.getDataPost("963ca3d091ba71bdd8596994ad7549b5", "android")
-            }
-            .execute {
-                success { response ->
-                    Log.i(javaClass.name, response.toString())
-                    Toast.makeText(this@MainActivity, response.data?.key, Toast.LENGTH_SHORT).show()
+            .execute(
+                HttpApi::class.java,
+                {
+                    it.getDataPost("963ca3d091ba71bdd8596994ad7549b5", "android")
+                },
+                {
+                    success { response ->
+                        Log.i(javaClass.name, response.toString())
+                        Toast.makeText(this@MainActivity, response.data?.key, Toast.LENGTH_SHORT).show()
+                    }
+                    fail { e ->
+                        AlertDialog.Builder(this@MainActivity)
+                            .setMessage(e?.message)
+                            .setNegativeButton("确定") { dialog, _ -> dialog.dismiss() }.show()
+                    }
+                    specifiedTimeout {
+                        Log.i(javaClass.name, "请求超过1s还没有完成")
+                    }
                 }
-                fail { e ->
-                    AlertDialog.Builder(this@MainActivity)
-                        .setMessage(e?.message)
-                        .setNegativeButton("确定") { dialog, _ -> dialog.dismiss() }.show()
-                }
-                specifiedTimeout {
-                    Log.i(javaClass.name, "请求超过1s还没有完成")
-                }
-            }
+            )
     }
 
     private fun upLoadFile() {
         val file = getFile(this)
         val requestBody: RequestBody = file.asRequestBody("*/*; charset=UTF-8".toMediaTypeOrNull())
         val part: MultipartBody.Part = createFormData("file", file.name, requestBody) //key(file)与服务器一致
-        val builder = HttpBuilder.create(this)
+        val builder = HttpOptions.create(this)
             .setLoadingDialog(defaultDialog)
             .setDialogAttribute(
                 isShowDialog = false,
@@ -220,40 +226,43 @@ open class MainActivity : HttpActivity() {
             .setIsLogOutPut(true) //默认是false
             .setIsDefaultToast(true)
             .build()
-        RequestManager.builder()
-            .callManager<UpLoadEntity>()
-            .setHttpBuilder(builder)
+        RequestManager.get()
+            .buildRequest<UpLoadEntity>()
+            .setHttpOptions(builder)
             .setBaseUrl("https://upload.pgyer.com/")
-            .uploadCall(HttpApi::class.java) {
-                it.upload(
-                    "8fa554a43b63bad477fd55e72839528e".toRequestBody("text/plain".toMediaTypeOrNull()),
-                    "963ca3d091ba71bdd8596994ad7549b5".toRequestBody("text/plain".toMediaTypeOrNull()),
-                    part)
-            }
-            .uploadExecute {
-                start { disposable ->
-                    up_Disposable = disposable
-                    progressBarHorizontal?.progress = 0
+            .uploadExecute(
+                HttpApi::class.java,
+                {
+                    it.upload(
+                        "8fa554a43b63bad477fd55e72839528e".toRequestBody("text/plain".toMediaTypeOrNull()),
+                        "963ca3d091ba71bdd8596994ad7549b5".toRequestBody("text/plain".toMediaTypeOrNull()),
+                        part)
+                },
+                {
+                    start { disposable ->
+                        up_Disposable = disposable
+                        progressBarHorizontal?.progress = 0
+                    }
+                    progress { progress, bytesWritten, contentLength ->
+                        progressBarHorizontal?.progress = progress
+                        Log.e(
+                            "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
+                                    + bytesWritten + "，contentLength : " + contentLength
+                        )
+                    }
+                    success { response ->
+                        Log.i(javaClass.name, response.data?.appCreated?: "")
+                        Toast.makeText(this@MainActivity, response.data?.appCreated, Toast.LENGTH_SHORT).show()
+                    }
+                    fail { e ->
+                        Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
+                    }
+                    complete {
+                        Log.i(javaClass.name, "onFinishUpload")
+                        Toast.makeText(this@MainActivity, "onFinishUpload", Toast.LENGTH_SHORT).show()
+                    }
                 }
-                progress { progress, bytesWritten, contentLength ->
-                    progressBarHorizontal?.progress = progress
-                    Log.e(
-                        "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
-                                + bytesWritten + "，contentLength : " + contentLength
-                    )
-                }
-                success { response ->
-                    Log.i(javaClass.name, response.data?.appCreated?: "")
-                    Toast.makeText(this@MainActivity, response.data?.appCreated, Toast.LENGTH_SHORT).show()
-                }
-                fail { e ->
-                    Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
-                }
-                complete {
-                    Log.i(javaClass.name, "onFinishUpload")
-                    Toast.makeText(this@MainActivity, "onFinishUpload", Toast.LENGTH_SHORT).show()
-                }
-            }
+            )
     }
 
     /**
@@ -269,7 +278,7 @@ open class MainActivity : HttpActivity() {
     private fun downLoadFile() {
         val filePath = getExternalFilesDir("apk")?.path + File.separator
         val fileName = "demo.apk"
-        val builder = HttpBuilder.create(this)
+        val builder = HttpOptions.create(this)
             .setLoadingDialog(defaultDialog)
             .setDialogAttribute(
                 isShowDialog = false,
@@ -281,35 +290,38 @@ open class MainActivity : HttpActivity() {
             .setSpecifiedTimeoutMillis(2000)
             .setIsDefaultToast(true)
             .build()
-        RequestManager.builder()
-            .callManager<ResponseBody>()
-            .setHttpBuilder(builder)
+        RequestManager.get()
+            .buildRequest<ResponseBody>()
+            .setHttpOptions(builder)
             .setBaseUrl("http://s.downpp.com/")
-            .downloadCall(HttpApi::class.java) {
-                it.downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
-            }
-            .downloadExecute {
-                start { disposable ->
-                    down_Disposable = disposable
+            .downloadExecute(
+                HttpApi::class.java,
+                {
+                    it.downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
+                },
+                {
+                    start { disposable ->
+                        down_Disposable = disposable
+                    }
+                    progress { progress, bytesWritten, contentLength ->
+                        progressBarHorizontal?.progress = progress
+                        downLoadLength += bytesWritten
+                        Log.e(
+                            "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
+                                    + bytesWritten + "，contentLength : " + contentLength
+                        )
+                    }
+                    fail { e ->
+                        Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
+                    }
+                    complete {
+                        Log.i(javaClass.name, "onFinishDownload")
+                        Toast.makeText(this@MainActivity, "onFinishDownload", Toast.LENGTH_SHORT).show()
+                    }
+                    specifiedTimeout {
+                        Log.i(javaClass.name, "请求超过2s还没有完成")
+                    }
                 }
-                progress { progress, bytesWritten, contentLength ->
-                    progressBarHorizontal?.progress = progress
-                    downLoadLength += bytesWritten
-                    Log.e(
-                        "upLoad---- > ", "progress : " + progress + "，bytesWritten : "
-                                + bytesWritten + "，contentLength : " + contentLength
-                    )
-                }
-                fail { e ->
-                    Toast.makeText(this@MainActivity, e?.message, Toast.LENGTH_SHORT).show()
-                }
-                complete {
-                    Log.i(javaClass.name, "onFinishDownload")
-                    Toast.makeText(this@MainActivity, "onFinishDownload", Toast.LENGTH_SHORT).show()
-                }
-                specifiedTimeout {
-                    Log.i(javaClass.name, "请求超过2s还没有完成")
-                }
-            }
+            )
     }
 }
