@@ -34,7 +34,7 @@
 
         RequestManager.get()
             .buildRequest<DoGetEntity>()
-            .setHttpOptions(HttpBuilder.getDefaultHttpOptions(this))//默认使用Application的配置
+            .setHttpOptions(httpOptions.getDefaultHttpOptions(this))//默认使用Application的配置
             .setBaseUrl("http://news-at.zhihu.com")
             .execute(
                 HttpApi::class.java,

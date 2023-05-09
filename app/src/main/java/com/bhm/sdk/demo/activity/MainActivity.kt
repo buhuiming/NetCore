@@ -144,7 +144,7 @@ open class MainActivity : HttpActivity() {
 
     private fun doGet() {
         /*单独使用配置*/
-        /*HttpBuilder builder = HttpBuilder.create(this)
+        /*httpOptions builder = httpOptions.create(this)
                 .setLoadingDialog(RxLoadingDialog.getDefaultDialog())
 //                .setLoadingDialog(new MyLoadingDialog())
                 .setDialogAttribute(true, false, false)
