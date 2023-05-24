@@ -1,7 +1,7 @@
 package com.bhm.network.base
 
-import com.bhm.network.core.HttpOptions
 import android.app.Activity
+import com.bhm.network.core.HttpOptions
 
 /**
  * Created by bhm on 2022/9/15.
@@ -20,6 +20,9 @@ open class HttpLoadingDialog {
         if (!builder.activity.isFinishing && builder.isShowDialog) {
             if (httpLoadingFragment == null) {
                 httpLoadingFragment = initDialog(builder)
+                httpLoadingFragment?.setCancelDialogEvent{
+                    cancelLoading(builder.activity)
+                }
             }
             val fm = builder.activity.supportFragmentManager
             showAgain =
@@ -49,16 +52,5 @@ open class HttpLoadingDialog {
             httpLoadingFragment = null
         }
         showAgain = false
-    }
-
-    companion object {
-        private var RxDialog: HttpLoadingDialog? = null
-        val defaultDialog: HttpLoadingDialog?
-            get() {
-                if (null == RxDialog) {
-                    RxDialog = HttpLoadingDialog()
-                }
-                return RxDialog
-            }
     }
 }

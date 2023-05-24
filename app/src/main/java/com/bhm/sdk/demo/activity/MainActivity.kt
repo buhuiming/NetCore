@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bhm.netcore.R
 import com.bhm.network.base.HttpActivity
-import com.bhm.network.base.HttpLoadingDialog.Companion.defaultDialog
+import com.bhm.network.base.HttpLoadingDialog
 import com.bhm.network.core.HttpOptions
 import com.bhm.network.core.RequestManager
 import com.bhm.sdk.demo.adapter.MainUIAdapter
@@ -145,7 +145,7 @@ open class MainActivity : HttpActivity() {
     private fun doGet() {
         /*单独使用配置*/
         /*httpOptions builder = httpOptions.create(this)
-                .setLoadingDialog(RxLoadingDialog.getDefaultDialog())
+                .setLoadingDialog(HttpLoadingDialog())
 //                .setLoadingDialog(new MyLoadingDialog())
                 .setDialogAttribute(true, false, false)
                 .setHttpTimeOut(20000, 20000)
@@ -217,7 +217,7 @@ open class MainActivity : HttpActivity() {
         val requestBody: RequestBody = file.asRequestBody("*/*; charset=UTF-8".toMediaTypeOrNull())
         val part: MultipartBody.Part = createFormData("file", file.name, requestBody) //key(file)与服务器一致
         val builder = HttpOptions.create(this)
-            .setLoadingDialog(defaultDialog)
+            .setLoadingDialog(HttpLoadingDialog())
             .setDialogAttribute(
                 isShowDialog = false,
                 cancelable = false,
@@ -279,7 +279,7 @@ open class MainActivity : HttpActivity() {
         val filePath = getExternalFilesDir("apk")?.path + File.separator
         val fileName = "demo.apk"
         val builder = HttpOptions.create(this)
-            .setLoadingDialog(defaultDialog)
+            .setLoadingDialog(HttpLoadingDialog())
             .setDialogAttribute(
                 isShowDialog = false,
                 cancelable = false,

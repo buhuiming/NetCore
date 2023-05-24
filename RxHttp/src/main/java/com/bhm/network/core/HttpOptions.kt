@@ -226,7 +226,7 @@ class HttpOptions(private val builder: Builder) {
         @JvmStatic
         fun getDefaultHttpOptions(activity: HttpActivity): HttpOptions {
             return create(activity)
-                .setLoadingDialog(HttpLoadingDialog.defaultDialog)
+                .setLoadingDialog(HttpLoadingDialog())
                 .build()
         }
 
