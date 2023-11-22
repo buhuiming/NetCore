@@ -4,7 +4,6 @@ import com.bhm.network.adapter.IntegerDefaultAdapter
 import com.bhm.network.adapter.LongDefaultAdapter
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.bhm.network.core.ResponseConverterFactory.Companion.create
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 
@@ -21,7 +20,13 @@ class RetrofitHelper(private val builder: HttpOptions) {
             .baseUrl(url)
             .client(GenerateOkHttpClient().make(builder))
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-            .addConverterFactory(create(gsonBuilder, builder.messageKey, builder.codeKey, builder.dataKey, builder.successCode))
+            .addConverterFactory(NetCoreConverterFactory.create(
+                gsonBuilder,
+                builder.messageKey,
+                builder.codeKey,
+                builder.dataKey,
+                builder.successCode)
+            )
             .build()
         return retrofit.create(clazz)
     }
