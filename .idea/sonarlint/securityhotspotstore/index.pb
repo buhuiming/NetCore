@@ -9,3 +9,11 @@ v
 FRxHttp/src/main/java/com/bhm/network/core/GsonResponseBodyConverter.kt,5\3\53c65df70035e8335839d2a61432a6d26221256e
 @
 app/build.gradle,f\4\f4a01d6a4fcb971362ec00a83903fd3902f52164
+p
+@RxHttp/src/main/java/com/bhm/network/base/HttpLoadingFragment.kt,e\7\e7f64d8a8abf850a553228d0470251aa0f1283fa
+k
+;RxHttp/src/main/java/com/bhm/network/core/RequestManager.kt,9\7\9794173cd513fddad568fd5bb72ba05943ac761f
+h
+8RxHttp/src/main/java/com/bhm/network/core/HttpOptions.kt,3\b\3be69ae19ecd83cdc8d0126d2585b539ea181798
+g
+7RxHttp/src/main/java/com/bhm/network/core/HttpConfig.kt,4\e\4e0523eb04fb795bbfbd2194594dc6bace5d778b

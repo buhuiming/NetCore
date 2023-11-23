@@ -1,26 +1,24 @@
-@file:Suppress("unused")
-
 package com.bhm.network.core
 
-import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
+import com.bhm.network.base.HttpActivity
 import com.bhm.network.base.HttpLoadingDialog
 import com.bhm.network.core.HttpConfig.Companion.cancelable
 import com.bhm.network.core.HttpConfig.Companion.httpLoadingDialog
 import com.bhm.network.core.HttpConfig.Companion.writtenLength
 import com.bhm.network.core.callback.CallBackImp
 import com.bhm.network.define.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.ObservableTransformer
+import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.OkHttpClient
 
 /**
- * Created by bhm on 2023/5/6.
+ * Created by bhm on 2022/9/15.
  */
+@Suppress("unused")
 class HttpOptions(private val builder: Builder) {
     var currentRequestDateTamp: Long = 0
-    val activity: FragmentActivity
+    val activity: HttpActivity
         get() = builder.activity
     var callBack: CallBackImp<*>? = null
     val isShowDialog: Boolean
@@ -31,6 +29,8 @@ class HttpOptions(private val builder: Builder) {
         get() = builder.dialog
     val isDefaultToast: Boolean
         get() = builder.isDefaultToast
+    val disposeManager: DisposeManager?
+        get() = builder.disposeManager
     val readTimeOut: Int
         get() = builder.readTimeOut
     val connectTimeOut: Int
@@ -47,8 +47,6 @@ class HttpOptions(private val builder: Builder) {
         get() = builder.isDialogDismissInterruptRequest
     val isAppendWrite: Boolean
         get() = builder.isAppendWrite
-    val jobKey: String
-        get() = builder.jobKey
 
     fun writtenLength(): Long {
         return builder.writtenLength
@@ -73,7 +71,8 @@ class HttpOptions(private val builder: Builder) {
     val parseDataKey: Boolean
         get() = builder.parseDataKey
 
-    class Builder(val activity: FragmentActivity) {
+    class Builder(val activity: HttpActivity) {
+        internal var disposeManager: DisposeManager? = activity.disposeManager
         internal var isShowDialog = HttpConfig.isShowDialog
         internal var isCancelable = cancelable()
         internal var dialog = httpLoadingDialog
@@ -96,24 +95,6 @@ class HttpOptions(private val builder: Builder) {
         internal var dataKey = HttpConfig.dataKey
         internal var successCode = HttpConfig.successCode
         internal var parseDataKey = HttpConfig.parseDataKey
-        internal var jobKey = System.currentTimeMillis().toString()
-
-        init {
-            activity.lifecycle.addObserver(object : DefaultLifecycleObserver {
-                override fun onDestroy(owner: LifecycleOwner) {
-                    super.onDestroy(owner)
-                    if (isDialogDismissInterruptRequest) {
-                        JobManager.get().removeJob(jobKey)
-                    }
-                    if (activity.isTaskRoot) {
-                        JobManager.get().clear()
-                    }
-                    dialog?.close()
-                    dialog = null
-                    activity.lifecycle.removeObserver(this)
-                }
-            })
-        }
 
         /**
          * 设置请求loading页面
@@ -246,13 +227,25 @@ class HttpOptions(private val builder: Builder) {
 
     companion object {
         @JvmStatic
-        fun create(activity: FragmentActivity) = Builder(activity)
+        fun create(activity: HttpActivity) = Builder(activity)
 
         @JvmStatic
-        fun getDefaultHttpOptions(activity: FragmentActivity): HttpOptions {
+        fun getDefaultHttpOptions(activity: HttpActivity): HttpOptions {
             return create(activity)
                 .setLoadingDialog(HttpLoadingDialog())
                 .build()
+        }
+
+        /**
+         * 统一线程处理
+         * 发布事件io线程，接收事件主线程
+         */
+        @JvmStatic
+        internal fun <T : Any> rxSchedulerHelper(): ObservableTransformer<T, T> { //compose处理线程
+            return ObservableTransformer { upstream ->
+                upstream.subscribeOn(Schedulers.io()) //读写文件、读写数据库、网络信息交互等
+                    .observeOn(AndroidSchedulers.mainThread()) //指定的是它之后的操作所在的线程。
+            }
         }
     }
 }
