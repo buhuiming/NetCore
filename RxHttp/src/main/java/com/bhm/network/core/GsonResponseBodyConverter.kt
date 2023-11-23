@@ -15,6 +15,7 @@ class GsonResponseBodyConverter<T> internal constructor(
     private val codeKey: String,
     private val dataKey: String,
     private val successCode: Int,
+    private val parseDataKey: Boolean,
 ) : Converter<ResponseBody, T> {
     @Throws(IOException::class)
     override fun convert(value: ResponseBody): T {
@@ -29,7 +30,11 @@ class GsonResponseBodyConverter<T> internal constructor(
             code == successCode || code == 0 -> {
                 //successCode的时候就直接解析
                 try {
-                    gson.fromJson(response, type)
+                    if (parseDataKey && data != null) {
+                        gson.fromJson(data.toString(), type)
+                    } else {
+                        gson.fromJson(response, type)
+                    }
                 } catch (e: Exception) {
                     if (dataArr != null && "[]" == dataArr.toString()) {
                         //这种情况是一个空数组，但是声明的却不是一个数组

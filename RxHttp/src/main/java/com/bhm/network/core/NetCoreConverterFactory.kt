@@ -21,7 +21,8 @@ internal class NetCoreConverterFactory private constructor(
     private val messageKey: String = MESSAGE_KEY,
     private val codeKey: String = CODE_KEY,
     private val dataKey: String = DATA_KEY,
-    private val successCode: Int = OK_CODE
+    private val successCode: Int = OK_CODE,
+    private val parseDataKey: Boolean
 ) : Converter.Factory() {
     private val gson: Gson
     override fun responseBodyConverter(
@@ -30,7 +31,15 @@ internal class NetCoreConverterFactory private constructor(
         retrofit: Retrofit
     ): Converter<ResponseBody, *> {
         //返回我们自定义的Gson响应体变换器
-        return GsonResponseBodyConverter<Any>(gson, type, messageKey, codeKey, dataKey, successCode)
+        return GsonResponseBodyConverter<Any>(
+            gson,
+            type,
+            messageKey,
+            codeKey,
+            dataKey,
+            successCode,
+            parseDataKey
+        )
     }
 
     override fun requestBodyConverter(
@@ -48,8 +57,10 @@ internal class NetCoreConverterFactory private constructor(
                    messageKey: String,
                    codeKey: String,
                    dataKey: String,
-                   successCode: Int = OK_CODE): NetCoreConverterFactory {
-            return NetCoreConverterFactory(gson, messageKey, codeKey, dataKey, successCode)
+                   successCode: Int = OK_CODE,
+                   parseDataKey: Boolean
+        ): NetCoreConverterFactory {
+            return NetCoreConverterFactory(gson, messageKey, codeKey, dataKey, successCode, parseDataKey)
         }
     }
 

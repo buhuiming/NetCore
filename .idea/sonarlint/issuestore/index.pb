@@ -121,8 +121,6 @@ q
 ARxHttp/src/main/java/com/bhm/network/body/DownloadResponseBody.kt,d\c\dc4de8e621e518d981db0e3113731e2be77a6079
 h
 8RxHttp/src/main/java/com/bhm/network/base/WeakHandler.kt,f\0\f099feb0335e671da058fdfc9da710880a71bdad
-u
-ERxHttp/src/main/java/com/bhm/network/core/ResponseConverterFactory.kt,d\3\d34ea95710c49e48f24fd362268215c2a19fad4f
 n
 >RxHttp/src/main/java/com/bhm/network/body/UploadRequestBody.kt,a\e\ae826a5fd0af111354938f0d0e6a5356bbb106b0
 z

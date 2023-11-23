@@ -8,7 +8,7 @@ import com.bhm.network.define.OK_CODE
 import okhttp3.OkHttpClient
 
 /**
- * Created by bhm on 2022/9/15.
+ * Created by bhm on 2023/5/6.
  */
 @Suppress("unused")
 class HttpConfig(builder: Builder) {
@@ -35,6 +35,7 @@ class HttpConfig(builder: Builder) {
         internal var codeKey: String = CODE_KEY
         internal var dataKey: String = DATA_KEY
         internal var successCode: Int = OK_CODE
+        internal var parseDataKey: Boolean = false
 
         /**
          * 设置请求loading页面
@@ -146,15 +147,18 @@ class HttpConfig(builder: Builder) {
          * @param codeKey 返回码字段名
          * @param dataKey 数据字段名
          * @param successCode 成功时的状态码值，默认[OK_CODE]
+         * @param parseDataKey 解析整个Json还是解析dataKey部分，默认false
          */
         fun setJsonCovertKey(messageKey: String = MESSAGE_KEY,
                              codeKey: String = CODE_KEY,
                              dataKey: String = DATA_KEY,
-                             successCode: Int = OK_CODE) = apply {
+                             successCode: Int = OK_CODE,
+                             parseDataKey: Boolean = false) = apply {
             this.messageKey = messageKey
             this.codeKey = codeKey
             this.dataKey = dataKey
             this.successCode = successCode
+            this.parseDataKey = parseDataKey
         }
 
         fun build(): HttpConfig {
@@ -165,7 +169,7 @@ class HttpConfig(builder: Builder) {
     companion object {
         @JvmStatic
         var httpLoadingDialog: HttpLoadingDialog? = null
-            private set
+            internal set
         @JvmStatic
         var isShowDialog: Boolean = false
             private set
@@ -228,6 +232,9 @@ class HttpConfig(builder: Builder) {
         @JvmStatic
         var successCode: Int = OK_CODE
             private set
+        @JvmStatic
+        var parseDataKey: Boolean = false
+            private set
 
         @JvmStatic
         fun create() = Builder()
@@ -265,5 +272,6 @@ class HttpConfig(builder: Builder) {
         codeKey = builder.codeKey
         dataKey = builder.dataKey
         successCode = builder.successCode
+        parseDataKey = builder.parseDataKey
     }
 }
