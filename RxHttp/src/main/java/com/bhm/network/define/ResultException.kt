@@ -5,12 +5,14 @@ import java.io.IOException
 //后台返回非OK_CODE时，抛出此异常
 @Suppress("ConvertSecondaryConstructorToPrimary")
 class ResultException : IOException {
-    var code = 0
+    var code = 0 //成功时，返回的是自定义的code，失败时和realCode一样，后台返回
+    var realCode = 0
     override var message: String? = null
     var realJson: String? = null //原来的json
 
-    constructor(code: Int, message: String?, realJson: String?) : super(message) {
+    constructor(code: Int, realCode: Int, message: String?, realJson: String?) : super(message) {
         this.code = code
+        this.realCode = realCode
         this.message = message
         this.realJson = realJson
     }

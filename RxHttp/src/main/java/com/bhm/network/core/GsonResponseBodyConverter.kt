@@ -41,17 +41,17 @@ class GsonResponseBodyConverter<T> internal constructor(
                         jsonObject.put(dataKey, null)
                         gson.fromJson<T>(jsonObject.toString(), type)
                     } else {
-                        throw ResultException(code, message, response)
+                        throw ResultException(code, code, message, response)
                     }
                 }
             }
             data == null && dataArr == null -> {
                 //这种情况是请求成功，但是json不是合理的
-                throw ResultException(successCode, message?: "json is illegal", response)
+                throw ResultException(successCode, code, message?: "json is illegal", response)
             }
             else -> {
                 //抛一个自定义ResultException 传入失败时候的状态码，和信息
-                throw ResultException(code, message, response)
+                throw ResultException(code, code, message, response)
             }
         }
     }

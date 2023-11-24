@@ -17,3 +17,7 @@ h
 8RxHttp/src/main/java/com/bhm/network/core/HttpOptions.kt,3\b\3be69ae19ecd83cdc8d0126d2585b539ea181798
 g
 7RxHttp/src/main/java/com/bhm/network/core/HttpConfig.kt,4\e\4e0523eb04fb795bbfbd2194594dc6bace5d778b
+9
+	README.md,8\e\8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
+n
+>RxHttp/src/main/java/com/bhm/network/define/ResultException.kt,0\a\0a450f784b6d2b75b486f45c6017524e930c1eb0
