@@ -32,6 +32,7 @@ class CacheInterceptor {
                     .header(USER_AGENT, getUserAgent(builder.activity))
                     .build()
                 val response = chain.proceed(request)
+                builder.callBack?.code = response.code
                 response.newBuilder()
                     .removeHeader("Pragma")
                     .removeHeader(CACHE_CONTROL)
@@ -48,6 +49,7 @@ class CacheInterceptor {
                     .header(USER_AGENT, getUserAgent(builder.activity))
                     .build()
                 val response = chain.proceed(request)
+                builder.callBack?.code = response.code
                 response.newBuilder()
                     .removeHeader("Pragma")
                     .removeHeader(CACHE_CONTROL)

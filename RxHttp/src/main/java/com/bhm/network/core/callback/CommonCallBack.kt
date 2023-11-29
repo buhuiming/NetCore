@@ -16,6 +16,8 @@ open class CommonCallBack<T> : SpecifiedTimeoutCallBack<T>() {
 
     private var _complete: (() -> Unit)? = null
 
+    override var code: Int = 0
+
     fun start(value: (disposable: Disposable?) -> Unit) {
         _start = value
     }
