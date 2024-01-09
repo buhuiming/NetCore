@@ -103,9 +103,7 @@ class RequestManager private constructor() {
         }
 
         private fun checkOptions() {
-            if (httpOptions == null) {
-                throw IllegalArgumentException("Please initialize HttpOptions")
-            }
+            requireNotNull(httpOptions) { "Please initialize HttpOptions" }
         }
 
         /**
@@ -199,25 +197,32 @@ class RequestManager private constructor() {
                 httpOptions.dialog?.dismissLoading(httpOptions.activity)
             }
             if (httpOptions.isDefaultToast) {
-                if (e is HttpException) {
-                    if (e.code() == 404) {
-                        Toast.makeText(httpOptions.activity, e.message, Toast.LENGTH_SHORT).show()
-                    } else if (e.code() == 504) {
-                        Toast.makeText(httpOptions.activity, "请检查网络连接！", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(httpOptions.activity, "请检查网络连接！", Toast.LENGTH_SHORT).show()
+                when (e) {
+                    is HttpException -> {
+                        when {
+                            e.code() == 404 -> {
+                                Toast.makeText(httpOptions.activity, e.message, Toast.LENGTH_SHORT).show()
+                            }
+                            e.code() == 504 -> {
+                                Toast.makeText(httpOptions.activity, "请检查网络连接！", Toast.LENGTH_SHORT).show()
+                            }
+                            else -> {
+                                Toast.makeText(httpOptions.activity, "请检查网络连接！", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
-                } else if (e is IndexOutOfBoundsException
-                    || e is NullPointerException
-                    || e is JsonSyntaxException
-                    || e is IllegalStateException
-                    || e is ResultException
-                ) {
-                    Toast.makeText(httpOptions.activity, "数据异常，解析失败！", Toast.LENGTH_SHORT).show()
-                } else if (e is TimeoutException) {
-                    Toast.makeText(httpOptions.activity, "连接超时，请重试！", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(httpOptions.activity, "请求失败，请稍后再试！", Toast.LENGTH_SHORT).show()
+
+                    is IndexOutOfBoundsException, is NullPointerException, is JsonSyntaxException, is IllegalStateException, is ResultException -> {
+                        Toast.makeText(httpOptions.activity, "数据异常，解析失败！", Toast.LENGTH_SHORT).show()
+                    }
+
+                    is TimeoutException -> {
+                        Toast.makeText(httpOptions.activity, "连接超时，请重试！", Toast.LENGTH_SHORT).show()
+                    }
+
+                    else -> {
+                        Toast.makeText(httpOptions.activity, "请求失败，请稍后再试！", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

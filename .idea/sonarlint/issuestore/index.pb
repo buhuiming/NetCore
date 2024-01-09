@@ -157,3 +157,15 @@ k
 ;app/src/main/java/com/bhm/sdk/demo/activity/MainActivity.kt,5\9\59ca5d84a1197004f62a9cb9f53a7df61157ac7a
 t
 DRxHttp/src/main/java/com/bhm/network/core/NetCoreConverterFactory.kt,1\1\11994ef3bc844bb96e4d7944ccc9e15bdb706cc7
+u
+ERxHttp/src/main/java/com/bhm/network/core/GsonRequestBodyConverter.kt,e\5\e5b7239752ecd6d0d760add4829f779597fc1205
+?
+settings.gradle,0\5\05efc8b1657769a27696d478ded1e95f38737233
+X
+(gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
+@
+local.properties,0\7\0712df971a99ac4d2fccb8e0fb19f377f3374cca
+}
+Mapp/build/generated/source/buildConfig/debug/com/bhm/netcore/BuildConfig.java,8\6\86c3ec22a16becef982173bf32b208c4b5ccd1d8
+€
+PRxHttp/build/generated/source/buildConfig/debug/com/bhm/network/BuildConfig.java,0\6\063a7e1fad227cec70d3aac8e8a0efd6d1606a2d

@@ -1,6 +1,5 @@
 package com.bhm.network.core.interceptor
 
-import android.util.Log
 import com.bhm.network.core.HttpOptions
 import com.bhm.network.define.CommonUtil.logger
 import okhttp3.logging.HttpLoggingInterceptor
@@ -31,24 +30,24 @@ class LoggingInterceptor {
                 if (message.startsWith("{") && message.endsWith("}")
                     || message.startsWith("[") && message.endsWith("]")
                 ) {
-                    Log.e(javaClass.name, replaceBlank(message).trimIndent())
+                    logger(builder, javaClass.name, replaceBlank(message).trimIndent())
                 }
                 mMessage.append(message.trimIndent())
                 // 响应结束，打印整条日志
                 if (message.startsWith("<-- END HTTP")) {
-                    Log.e(javaClass.name, mMessage.toString())
+                    logger(builder, javaClass.name, mMessage.toString())
                 }
             }
         }.setLevel(HttpLoggingInterceptor.Level.BODY)
     }
 
     /**
-     * 去除字符串中的空格、回车、换行符、制表符
+     * 去除字符串中的回车、换行符、制表符
      */
     private fun replaceBlank(str: String?): String {
         var dest = ""
         if (str != null) {
-            val p = Pattern.compile("\\s*|\t|\r|\n")
+            val p = Pattern.compile("\\s*|\r|\n")
             val m = p.matcher(str)
             dest = m.replaceAll("")
         }

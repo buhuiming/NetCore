@@ -183,6 +183,7 @@ open class MainActivity : HttpActivity() {
                 dialogDismissInterruptRequest = false
             )
             .setIsLogOutPut(true)
+            .setDelaysProcessLimitTimeMillis(3000)
             .setSpecifiedTimeoutMillis(1000)
             .setIsDefaultToast(false)
             .build()
