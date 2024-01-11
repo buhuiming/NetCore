@@ -115,8 +115,6 @@ R
 "app/src/main/res/values/colors.xml,9\6\969faa2a5d9f5e8390e958d2c07f2cfd54676e6b
 S
 #app/src/main/res/values/strings.xml,d\2\d2281fbb3027de2722081a53408dd77628bf080e
-}
-Mapp/build/generated/source/buildConfig/debug/com/bhm/netcore/BuildConfig.java,8\6\86c3ec22a16becef982173bf32b208c4b5ccd1d8
 R
 "app/src/main/res/values/dimens.xml,c\3\c3c1811dec2dbad2deeafb9aad505ca9631da740
 X
@@ -145,8 +143,6 @@ e
 5app/src/main/java/com/bhm/sdk/demo/DemoApplication.kt,9\3\9379f6920fbd278fcf2ff413ca90581b38d43f81
 h
 8RxHttp/src/main/java/com/bhm/network/base/WeakHandler.kt,f\0\f099feb0335e671da058fdfc9da710880a71bdad
-€
-PRxHttp/build/generated/source/buildConfig/debug/com/bhm/network/BuildConfig.java,0\6\063a7e1fad227cec70d3aac8e8a0efd6d1606a2d
 q
 Aapp/src/main/java/com/bhm/sdk/demo/tools/MyHttpLoadingFragment.kt,e\e\ee5fc7835d63f7152de751a7dc28b2d21cf09291
 q

@@ -165,7 +165,3 @@ X
 (gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
 @
 local.properties,0\7\0712df971a99ac4d2fccb8e0fb19f377f3374cca
-}
-Mapp/build/generated/source/buildConfig/debug/com/bhm/netcore/BuildConfig.java,8\6\86c3ec22a16becef982173bf32b208c4b5ccd1d8
-€
-PRxHttp/build/generated/source/buildConfig/debug/com/bhm/network/BuildConfig.java,0\6\063a7e1fad227cec70d3aac8e8a0efd6d1606a2d
