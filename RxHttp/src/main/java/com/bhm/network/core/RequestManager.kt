@@ -160,8 +160,9 @@ class RequestManager private constructor() {
         @SuppressLint("CheckResult")
         private fun <T: Any> getBaseConsumer(callBack: CallBackImp<T>?): Consumer<T> {
             return Consumer { t ->
-                if (System.currentTimeMillis() - httpOptions.currentRequestDateTamp <= httpOptions.delaysProcessLimitTimeMillis) {
-                    Observable.timer(httpOptions.delaysProcessLimitTimeMillis, TimeUnit.MILLISECONDS)
+                val requestSpentTime = System.currentTimeMillis() - httpOptions.currentRequestDateTamp
+                if (requestSpentTime < httpOptions.delaysProcessLimitTimeMillis) {
+                    Observable.timer(httpOptions.delaysProcessLimitTimeMillis - requestSpentTime, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe { doBaseConsumer(callBack, t) }
                 } else {
@@ -181,8 +182,9 @@ class RequestManager private constructor() {
         private fun <T: Any> getThrowableConsumer(callBack: CallBackImp<T>?): Consumer<Throwable> {
             return Consumer { e ->
                 CommonUtil.logger(httpOptions, "ThrowableConsumer-> ", e.message) //抛异常
-                if (System.currentTimeMillis() - httpOptions.currentRequestDateTamp <= httpOptions.delaysProcessLimitTimeMillis) {
-                    Observable.timer(httpOptions.delaysProcessLimitTimeMillis, TimeUnit.MILLISECONDS)
+                val requestSpentTime = System.currentTimeMillis() - httpOptions.currentRequestDateTamp
+                if (requestSpentTime < httpOptions.delaysProcessLimitTimeMillis) {
+                    Observable.timer(httpOptions.delaysProcessLimitTimeMillis - requestSpentTime, TimeUnit.MILLISECONDS)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe { doThrowableConsumer(callBack, e) }
                 } else {
