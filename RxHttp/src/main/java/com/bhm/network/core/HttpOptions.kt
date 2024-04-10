@@ -70,6 +70,8 @@ class HttpOptions(private val builder: Builder) {
         get() = builder.successCode
     val parseDataKey: Boolean
         get() = builder.parseDataKey
+    val noProxy: Boolean
+        get() = builder.noProxy
 
     class Builder(val activity: HttpActivity) {
         internal var disposeManager: DisposeManager? = activity.disposeManager
@@ -95,6 +97,7 @@ class HttpOptions(private val builder: Builder) {
         internal var dataKey = HttpConfig.dataKey
         internal var successCode = HttpConfig.successCode
         internal var parseDataKey = HttpConfig.parseDataKey
+        internal var noProxy = true
 
         /**
          * 设置请求loading页面
@@ -134,6 +137,13 @@ class HttpOptions(private val builder: Builder) {
         fun setHttpTimeOut(readTimeOut: Int, connectTimeOut: Int) = apply {
             this.readTimeOut = readTimeOut
             this.connectTimeOut = connectTimeOut
+        }
+
+        /**
+         * 设置应用层是否可以抓包
+         */
+        fun setNoProxy(noProxy: Boolean) = apply {
+            this.noProxy = noProxy
         }
 
         /** 不推荐使用，使用此方法，将取消默认的设置，包括但不限于日志，缓存，下载，上传，网络，SSL。

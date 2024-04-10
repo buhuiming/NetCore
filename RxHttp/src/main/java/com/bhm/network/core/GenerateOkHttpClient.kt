@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import com.bhm.network.core.HttpCache.getCache
 import com.bhm.network.core.interceptor.*
 import okhttp3.OkHttpClient
+import java.net.Proxy
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
@@ -29,7 +30,11 @@ class GenerateOkHttpClient {
         if (builder.connectTimeOut > 0) {
             timeOutConnection = builder.connectTimeOut
         }
-        return OkHttpClient.Builder()
+        val clientBuilder = OkHttpClient.Builder()
+        if (builder.noProxy) {
+            clientBuilder.proxy(Proxy.NO_PROXY)
+        }
+        return clientBuilder
             .sslSocketFactory(unsafeOkHttpClient, object : X509TrustManager {
                 override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
                 override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
