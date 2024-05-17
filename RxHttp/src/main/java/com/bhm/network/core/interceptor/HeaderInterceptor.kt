@@ -19,7 +19,11 @@ class HeaderInterceptor {
                 stringBuilder.append("Header: ")
                 for (stringStringEntry in it.entries) {
                     val key = (stringStringEntry as Map.Entry<*, *>).key.toString()
-                    val value = (stringStringEntry as Map.Entry<*, *>).value.toString()
+                    val value =
+                        (stringStringEntry as Map.Entry<*, *>).value
+                            .toString()
+                            .replace("\u2212", "-")// 清洗字符串，去除不合法字符
+                            .replace("−", "-")//负号替换为减号
                     requestBuilder.addHeader(key, value)
                     stringBuilder.append(key)
                     stringBuilder.append(" = ")

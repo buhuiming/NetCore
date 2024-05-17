@@ -1,6 +1,7 @@
 package com.bhm.network.core
 
 import com.bhm.network.base.HttpLoadingDialog
+import com.bhm.network.core.callback.HttpLogEvent
 import com.bhm.network.define.CODE_KEY
 import com.bhm.network.define.DATA_KEY
 import com.bhm.network.define.MESSAGE_KEY
@@ -36,6 +37,7 @@ class HttpConfig(builder: Builder) {
         internal var dataKey: String = DATA_KEY
         internal var successCode: Int = OK_CODE
         internal var parseDataKey: Boolean = false
+        internal var httpLogEvent: HttpLogEvent? = null
 
         /**
          * 设置请求loading页面
@@ -161,6 +163,13 @@ class HttpConfig(builder: Builder) {
             this.parseDataKey = parseDataKey
         }
 
+        /*
+        * 设置日志打印输出接口
+        */
+        fun setHttpLogEvent(httpLogEvent: HttpLogEvent) = apply {
+            this.httpLogEvent = httpLogEvent
+        }
+
         fun build(): HttpConfig {
             return HttpConfig(this)
         }
@@ -232,8 +241,13 @@ class HttpConfig(builder: Builder) {
         @JvmStatic
         var successCode: Int = OK_CODE
             private set
+
         @JvmStatic
         var parseDataKey: Boolean = false
+            private set
+
+        @JvmStatic
+        var httpLogEvent: HttpLogEvent? = null
             private set
 
         @JvmStatic
@@ -273,5 +287,6 @@ class HttpConfig(builder: Builder) {
         dataKey = builder.dataKey
         successCode = builder.successCode
         parseDataKey = builder.parseDataKey
+        httpLogEvent = builder.httpLogEvent
     }
 }

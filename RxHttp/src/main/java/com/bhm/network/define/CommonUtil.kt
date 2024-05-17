@@ -73,9 +73,10 @@ object CommonUtil {
     }
 
     @JvmStatic
-    fun logger(httpOptions: HttpOptions, tag: String?, msg: String?) {
-        if (httpOptions.isLogOutPut) {
+    fun logger(httpOptions: HttpOptions?, tag: String?, msg: String?) {
+        if (httpOptions?.isLogOutPut == true) {
             Log.e(tag, msg?: "")
         }
+        httpOptions?.httpLogEvent?.onLog(HttpLogLevel.Error, tag?: "NetCore", msg)
     }
 }

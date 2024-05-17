@@ -165,3 +165,7 @@ X
 (gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
 @
 local.properties,0\7\0712df971a99ac4d2fccb8e0fb19f377f3374cca
+r
+BRxHttp/src/main/java/com/bhm/network/core/callback/HttpLogEvent.kt,e\0\e0b4292b27e76405795fd697b623988a35da0db3
+k
+;RxHttp/src/main/java/com/bhm/network/define/HttpLogLevel.kt,3\2\3267baf052a8e176c7869c3b32c9b02166a1a124

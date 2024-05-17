@@ -6,6 +6,7 @@ import com.bhm.network.core.HttpConfig.Companion.cancelable
 import com.bhm.network.core.HttpConfig.Companion.httpLoadingDialog
 import com.bhm.network.core.HttpConfig.Companion.writtenLength
 import com.bhm.network.core.callback.CallBackImp
+import com.bhm.network.core.callback.HttpLogEvent
 import com.bhm.network.define.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.ObservableTransformer
@@ -47,6 +48,8 @@ class HttpOptions(private val builder: Builder) {
         get() = builder.isDialogDismissInterruptRequest
     val isAppendWrite: Boolean
         get() = builder.isAppendWrite
+    val httpLogEvent: HttpLogEvent?
+        get() = builder.httpLogEvent
 
     fun writtenLength(): Long {
         return builder.writtenLength
@@ -98,6 +101,7 @@ class HttpOptions(private val builder: Builder) {
         internal var successCode = HttpConfig.successCode
         internal var parseDataKey = HttpConfig.parseDataKey
         internal var noProxy = true
+        internal var httpLogEvent = HttpConfig.httpLogEvent
 
         /**
          * 设置请求loading页面
@@ -228,6 +232,13 @@ class HttpOptions(private val builder: Builder) {
             this.dataKey = dataKey
             this.successCode = successCode
             this.parseDataKey = parseDataKey
+        }
+
+        /**
+         * 设置日志打印输出接口
+         */
+        fun setHttpLogEvent(httpLogEvent: HttpLogEvent) = apply {
+            this.httpLogEvent = httpLogEvent
         }
 
         fun build(): HttpOptions {

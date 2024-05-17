@@ -26,6 +26,7 @@
             .isDefaultToast(true)
             .isLogOutPut(true)
             .setHttpTimeOut(30, 30)
+            .setHttpLogEvent(MyHttpLogEvent()) //通过这个方法可以拿到NetCore-Flow打印的所有日志 
             .setDelaysProcessLimitTimeMillis(0) //请求成功/失败之后，再过0秒后去处理结果
             .setJsonCovertKey()//设置json解析的Key
             .setOkHttpClient(null)

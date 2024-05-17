@@ -165,3 +165,7 @@ n
 >RxHttp/src/main/java/com/bhm/network/body/UploadRequestBody.kt,a\e\ae826a5fd0af111354938f0d0e6a5356bbb106b0
 i
 9app/src/main/java/com/bhm/sdk/demo/entity/UpLoadEntity.kt,6\5\6590f778aaaa709916b582abf098b5f4f59a88b4
+r
+BRxHttp/src/main/java/com/bhm/network/core/callback/HttpLogEvent.kt,e\0\e0b4292b27e76405795fd697b623988a35da0db3
+k
+;RxHttp/src/main/java/com/bhm/network/define/HttpLogLevel.kt,3\2\3267baf052a8e176c7869c3b32c9b02166a1a124
