@@ -16,6 +16,8 @@ import com.bhm.network.base.HttpActivity
 import com.bhm.network.base.HttpLoadingDialog
 import com.bhm.network.core.HttpOptions
 import com.bhm.network.core.RequestManager
+import com.bhm.network.core.callback.HttpLogEvent
+import com.bhm.network.define.HttpLogLevel
 import com.bhm.sdk.demo.adapter.MainUIAdapter
 import com.bhm.sdk.demo.entity.DoGetEntity
 import com.bhm.sdk.demo.entity.DoPostEntity
@@ -182,7 +184,12 @@ open class MainActivity : HttpActivity() {
                 cancelable = false,
                 dialogDismissInterruptRequest = false
             )
-            .setIsLogOutPut(true)
+            .setIsLogOutPut(false)
+            .setHttpLogEvent(object : HttpLogEvent {
+                override fun onLog(level: HttpLogLevel, tag: String, message: String?) {
+                    Log.e(tag, ("自定义输出日志：$message"))
+                }
+            })
             .setDelaysProcessLimitTimeMillis(3000)
             .setSpecifiedTimeoutMillis(1000)
             .setIsDefaultToast(false)

@@ -17,7 +17,7 @@ class LoggingInterceptor {
 
     fun make(builder: HttpOptions): HttpLoggingInterceptor {
         return HttpLoggingInterceptor { message: String ->
-            if (builder.isLogOutPut) {
+            builder.httpLogEvent?.let {
                 // 请求或者响应开始
                 if (message.startsWith("--> POST") || message.startsWith("--> GET")) {
                     mMessage.delete(0, mMessage.length)
