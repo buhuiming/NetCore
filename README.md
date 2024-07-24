@@ -54,6 +54,8 @@
                 }
             )
 
+### 此版本不再维护，请使用[flow版本](https://github.com/buhuiming/NetCore-Flow)
+
 #### [RxJava3版本](https://github.com/buhuiming/NetCore)、[flow版本](https://github.com/buhuiming/NetCore-Flow)
     两者区别：基于RxJava线程管理和基于flow、协程
 
