@@ -17,18 +17,23 @@ class HeaderInterceptor {
             builder.defaultHeader?.let {
                 val stringBuilder = StringBuilder()
                 stringBuilder.append("Header: ")
-                for (stringStringEntry in it.entries) {
-                    val key = (stringStringEntry as Map.Entry<*, *>).key.toString()
-                    val value =
-                        (stringStringEntry as Map.Entry<*, *>).value
-                            .toString()
-                            .replace("\u2212", "-")// 清洗字符串，去除不合法字符
-                            .replace("−", "-")//负号替换为减号
-                    requestBuilder.addHeader(key, value)
-                    stringBuilder.append(key)
-                    stringBuilder.append(" = ")
-                    stringBuilder.append(value)
-                    stringBuilder.append(", ")
+                try {
+                    for (stringStringEntry in it.entries) {
+                        val key = (stringStringEntry as Map.Entry<*, *>).key.toString()
+                        val value =
+                            (stringStringEntry as Map.Entry<*, *>).value
+                                .toString()
+                                .replace("\u2212", "-")// 清洗字符串，去除不合法字符
+                                .replace("−", "-")//负号替换为减号
+                        requestBuilder.addHeader(key, value)
+                        stringBuilder.append(key)
+                        stringBuilder.append(" = ")
+                        stringBuilder.append(value)
+                        stringBuilder.append(", ")
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    CommonUtil.logger(builder, "Http Header", e.message)
                 }
                 CommonUtil.logger(builder, "Http Header", stringBuilder.toString())
             }

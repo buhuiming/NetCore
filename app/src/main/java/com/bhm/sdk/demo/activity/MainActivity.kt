@@ -1,6 +1,5 @@
 package com.bhm.sdk.demo.activity
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.os.Bundle
@@ -8,6 +7,8 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,8 +25,8 @@ import com.bhm.sdk.demo.entity.DoPostEntity
 import com.bhm.sdk.demo.entity.UpLoadEntity
 import com.bhm.sdk.demo.http.HttpApi
 import com.bhm.sdk.demo.tools.MyHttpLoadingDialog
+import com.bhm.sdk.demo.tools.Utils
 import com.bhm.sdk.demo.tools.Utils.getFile
-import com.tbruyelle.rxpermissions3.RxPermissions
 import io.reactivex.rxjava3.disposables.Disposable
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -42,17 +43,50 @@ open class MainActivity : HttpActivity() {
     private var main_recycle_view: RecyclerView? = null
     private var adapter: MainUIAdapter? = null
     private var progressBarHorizontal: ProgressBar? = null
-    private var rxPermissions: RxPermissions? = null
     private var down_Disposable: Disposable? = null
     private var up_Disposable: Disposable? = null
     private var downLoadLength: Long = 0 //已下载的长度
 
+    private var permissionLauncher: ActivityResultLauncher<Array<String>>? = null
+
+    private var permissionAgree: (() -> Unit)? = null
+
+    private var permissionRefuse: ((refusePermissions: ArrayList<String>) -> Unit)? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        rxPermissions = RxPermissions(this) //权限申请
+        permissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) {
+            val refusePermission: ArrayList<String> = ArrayList()
+            it.keys.forEach { res ->
+                if (it[res] == false) {
+                    refusePermission.add(res)
+                }
+            }
+
+            if (refusePermission.isNotEmpty()) {
+                permissionRefuse?.let {
+                    it(refusePermission)
+                }
+            } else {
+                permissionAgree?.let {
+                    it()
+                }
+            }
+        }
         initView()
         initListener()
+    }
+
+    @JvmOverloads
+    fun requestPermission(permissions: Array<String>,
+                          agree: (() -> Unit)? = null,
+                          refuse: ((refusePermissions: ArrayList<String>) -> Unit)? = null) {
+        this.permissionAgree = agree
+        this.permissionRefuse = refuse
+        permissionLauncher?.launch(permissions)
     }
 
     private fun initView() {
@@ -113,35 +147,30 @@ open class MainActivity : HttpActivity() {
     }
 
     private fun upLoad() {
-        rxPermissions?.request(
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        )?.subscribe { aBoolean ->
-            if (!aBoolean) {
+        requestPermission(
+            Utils.getStoragePermission(this)
+            , {
+                upLoadFile() //上传文件
+            }
+            , {
                 Toast.makeText(
                     this@MainActivity, "无法获取权限，请在设置中授权",
                     Toast.LENGTH_SHORT
                 ).show()
-            } else {
-                upLoadFile() //上传文件
-            }
-        }
+            })
     }
 
     private fun downLoad() {
-        rxPermissions?.request(
-            Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        )?.subscribe { aBoolean ->
-            if (!aBoolean) {
+        requestPermission(Utils.getStoragePermission(this)
+            , {
+                downLoadFile() //下载文件
+            }
+            , {
                 Toast.makeText(
                     this@MainActivity, "无法获取权限，请在设置中授权",
                     Toast.LENGTH_SHORT
                 ).show()
-            } else {
-                downLoadFile() //下载文件
-            }
-        }
+            })
     }
 
     private fun doGet() {
@@ -305,7 +334,7 @@ open class MainActivity : HttpActivity() {
             .downloadExecute(
                 HttpApi::class.java,
                 {
-                    it.downLoad("bytes=$downLoadLength-", "http://s.downpp.com/apk9/shwnl4.0.0_2265.com.apk")
+                    it.downLoad("bytes=$downLoadLength-", "http://s1.downpp.com/apk6/com.juying.xstq_v1.1.3_2265.com.apk")
                 },
                 {
                     start { disposable ->

@@ -10,7 +10,7 @@ import okhttp3.Interceptor
  * @date :2022/9/16 17:00
  */
 class DownloadInterceptor {
-    fun make(builder: HttpOptions?): Interceptor {
+    fun make(builder: HttpOptions): Interceptor {
         return Interceptor { chain: Interceptor.Chain ->
             val response = chain.proceed(chain.request())
             response.newBuilder().body(

@@ -16,7 +16,7 @@ import java.io.IOException
  */
 class DownloadResponseBody(
     private val responseBody: ResponseBody,
-    private val httpOptions: HttpOptions?
+    private val httpOptions: HttpOptions
 ) : ResponseBody() {
     // BufferedSource 是okio库中的输入流，这里就当作inputStream来使用。
     private var bufferedSource: BufferedSource? = null
@@ -37,52 +37,53 @@ class DownloadResponseBody(
 
     private fun source(source: Source): Source {
         return object : ForwardingSource(source) {
-            var totalBytesRead = httpOptions?.writtenLength() ?: 0L
-            val totalBytes = if (httpOptions == null) responseBody.contentLength() else httpOptions.writtenLength() + responseBody.contentLength()
+            var totalBytesRead = httpOptions.writtenLength() ?: 0L
+            val totalBytes = httpOptions.writtenLength() + responseBody.contentLength()
 
             @SuppressLint("CheckResult")
             @Throws(IOException::class)
             override fun read(sink: Buffer, byteCount: Long): Long {
+                if (httpOptions.callBack == null || httpOptions.callBack !is DownloadCallBack) {
+                    return super.read(sink, byteCount)
+                }
                 val bytesRead = super.read(sink, byteCount)
-                // read() returns the number of bytes read, or -1 if this source is exhausted.
-                httpOptions?.callBack?.let { callBack ->
-                    if (callBack is DownloadCallBack) {
-                        if (totalBytesRead == 0L && bytesRead != -1L) {
-                            CommonUtil.deleteFile(httpOptions, totalBytes)
-                            Observable.just(bytesRead)
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe {
-                                    CommonUtil.logger(httpOptions, "DownLoad-- > ", "begin downLoad")
-                                }
-                        }
-                        totalBytesRead += if (bytesRead != -1L) bytesRead else 0
-                        if (bytesRead != -1L) {
-                            val progress = (totalBytesRead * 100 / totalBytes).toInt()
-                            Observable.just(bytesRead)
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe {
-                                    callBack.onProgress(
-                                        if (progress > 100) 100 else progress,
-                                        bytesRead,
-                                        totalBytes
-                                    )
-                                }
-                            if (totalBytesRead == totalBytes) {
-                                Observable.just(bytesRead)
-                                    .observeOn(AndroidSchedulers.mainThread())
-                                    .subscribe {
-                                        callBack.onProgress(100, bytesRead, totalBytes)
-                                        callBack.onComplete()
-                                        CommonUtil.logger(httpOptions, "DownLoad-- > ", "finish downLoad")
-                                        if (null != httpOptions.dialog && httpOptions.isShowDialog) {
-                                            httpOptions.dialog?.dismissLoading(httpOptions.activity)
-                                        }
-                                    }
+                val callBack = httpOptions.callBack as DownloadCallBack
+                if (totalBytesRead == 0L && bytesRead != -1L) {
+                    CommonUtil.deleteFile(httpOptions, totalBytes)
+                    if (httpOptions.isLogOutPut) {
+                        Observable.just(bytesRead)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                CommonUtil.logger(httpOptions, "DownLoad-- > ", "begin downLoad")
                             }
-                        }
-                        CommonUtil.writeFile(sink.inputStream(), httpOptions)
                     }
                 }
+                totalBytesRead += if (bytesRead != -1L) bytesRead else 0
+                if (bytesRead != -1L) {
+                    val progress = (totalBytesRead * 100 / totalBytes).toInt()
+                    Observable.just(bytesRead)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe {
+                            callBack.onProgress(
+                                if (progress > 100) 100 else progress,
+                                bytesRead,
+                                totalBytes
+                            )
+                        }
+                    if (totalBytesRead == totalBytes) {
+                        Observable.just(bytesRead)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe {
+                                callBack.onProgress(100, bytesRead, totalBytes)
+                                callBack.onComplete()
+                                CommonUtil.logger(httpOptions, "DownLoad-- > ", "finish downLoad")
+                                if (null != httpOptions.dialog && httpOptions.isShowDialog) {
+                                    httpOptions.dialog?.dismissLoading(httpOptions.activity)
+                                }
+                            }
+                    }
+                }
+                CommonUtil.writeFile(sink.inputStream(), httpOptions)
                 return bytesRead
             }
         }

@@ -10,7 +10,7 @@
         }
 
         dependencies {
-            implementation 'com.github.buhuiming:NetCore:1.1.2'
+            implementation 'com.github.buhuiming:NetCore:1.6.0'
         }
 
 #### 1、Activity继承HttpActivity，Fragment继承HttpFragment，DialogFragment继承HttpDialogFragment (实现内存管理)
@@ -53,8 +53,6 @@
                     }
                 }
             )
-
-### 此版本不再维护，请使用[flow版本](https://github.com/buhuiming/NetCore-Flow)
 
 #### [RxJava3版本](https://github.com/buhuiming/NetCore)、[flow版本](https://github.com/buhuiming/NetCore-Flow)
     两者区别：基于RxJava线程管理和基于flow、协程

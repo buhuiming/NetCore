@@ -35,7 +35,7 @@ class UploadRequestBody(private val mRequestBody: RequestBody, private val httpO
         if (sink is Buffer
             || sink.toString().contains(
                 "com.android.tools.profiler.support.network.HttpTracker\$OutputStreamTracker")) {
-            mRequestBody.writeTo(sink);
+            mRequestBody.writeTo(sink)
         } else {
             val bufferedSink: BufferedSink
             val mCountingSink = CountingSink(sink)
@@ -53,31 +53,31 @@ class UploadRequestBody(private val mRequestBody: RequestBody, private val httpO
         @Throws(IOException::class)
         override fun write(source: Buffer, byteCount: Long) {
             super.write(source, byteCount)
-            httpOptions?.callBack?.let { callBack ->
-                if (callBack is UploadCallBack<*>) {
-                    if (contentLength == 0L) {
-                        contentLength = contentLength()
-                    }
-                    if (bytesWritten == 0L) {
-                        Observable.just(bytesWritten)
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe {
-                                CommonUtil.logger(httpOptions, "upLoad-- > ", "begin upLoad")
-                            }
-                    }
-                    bytesWritten += byteCount
-                    val progress = (bytesWritten * 100 / contentLength).toInt()
-                    Observable.just(bytesWritten)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe {
-                            callBack.onProgress(
-                                if (progress > 100) 100 else progress,
-                                byteCount,
-                                contentLength
-                            )
-                        }
-                }
+            if (httpOptions?.callBack == null || httpOptions.callBack !is UploadCallBack<*>) {
+                return
             }
+            if (contentLength == 0L) {
+                contentLength = contentLength()
+            }
+            if (bytesWritten == 0L) {
+                Observable.just(bytesWritten)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        CommonUtil.logger(httpOptions, "upLoad-- > ", "begin upLoad")
+                    }
+            }
+            bytesWritten += byteCount
+            val progress = (bytesWritten * 100 / contentLength).toInt()
+            val callBack = httpOptions.callBack as UploadCallBack<*>
+            Observable.just(bytesWritten)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe {
+                    callBack.onProgress(
+                        if (progress > 100) 100 else progress,
+                        byteCount,
+                        contentLength
+                    )
+                }
         }
     }
 }
