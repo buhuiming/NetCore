@@ -2,7 +2,9 @@ package com.bhm.network.base
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
 import android.content.DialogInterface
+import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.KeyEvent
@@ -16,11 +18,23 @@ import com.bhm.network.core.HttpOptions
 import com.trello.rxlifecycle4.components.support.RxDialogFragment
 import java.util.*
 
-open class HttpLoadingFragment(private val builder: HttpOptions) : RxDialogFragment() {
+open class HttpLoadingFragment : RxDialogFragment() {
 
     private var textView: TextView? = null
 
     private var cancelDialogEvent: (() -> Unit)? = null
+
+    var builder: HttpOptions? = null
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            arguments?.getSerializable("httpOptions", HttpOptions::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            arguments?.getSerializable("httpOptions") as HttpOptions?
+        }
+    }
 
     override fun show(manager: FragmentManager, tag: String?) {
         try {
@@ -74,23 +88,29 @@ open class HttpLoadingFragment(private val builder: HttpOptions) : RxDialogFragm
         if (activity != null) {
             dialog.setOwnerActivity(requireActivity())
             dialog.setCanceledOnTouchOutside(false) //这个值最好设置成false，点击其他区域关闭loading，体验效果不佳
-            dialog.setCancelable(builder.isCancelable)
+            dialog.setCancelable(builder?.isCancelable?: false)
             dialog.setOnKeyListener(DialogInterface.OnKeyListener { _, i, keyEvent ->
                 if (i == KeyEvent.KEYCODE_BACK && dialog.isShowing
                     && keyEvent.action == KeyEvent.ACTION_UP
                 ) {
-                    if (builder.isCancelable) {
-                        if (builder.isDialogDismissInterruptRequest) {
-                            builder.disposeManager?.removeDispose()
+                    if (builder?.isCancelable == true) {
+                        if (builder?.isDialogDismissInterruptRequest == true) {
+                            builder?.disposeManager?.removeDispose()
                         }
                         cancelDialogEvent?.invoke()
+                        if (cancelDialogEvent == null) {
+                            dismiss()
+                        }
                         return@OnKeyListener true
                     }
                     if (System.currentTimeMillis() - onBackPressed > 1000) {
                         onBackPressed = System.currentTimeMillis()
                     } else {
-                        builder.disposeManager?.removeDispose()
+                        builder?.disposeManager?.removeDispose()
                         cancelDialogEvent?.invoke()
+                        if (cancelDialogEvent == null) {
+                            dismiss()
+                        }
                     }
                 }
                 true
@@ -111,8 +131,8 @@ open class HttpLoadingFragment(private val builder: HttpOptions) : RxDialogFragm
             )
         ) // 设置布局
         textView = v.findViewById(R.id.dialog_text_loading)
-        if (!TextUtils.isEmpty(builder.loadingTitle)) {
-            textView?.text = builder.loadingTitle
+        if (!TextUtils.isEmpty(builder?.loadingTitle)) {
+            textView?.text = builder?.loadingTitle
         }
         return dialog
     }

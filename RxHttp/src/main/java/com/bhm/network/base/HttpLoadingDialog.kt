@@ -1,6 +1,7 @@
 package com.bhm.network.base
 
 import android.app.Activity
+import android.os.Bundle
 import com.bhm.network.core.HttpOptions
 
 /**
@@ -37,7 +38,11 @@ open class HttpLoadingDialog {
     }
 
     open fun initDialog(builder: HttpOptions?): HttpLoadingFragment {
-        return HttpLoadingFragment(builder!!)
+        return HttpLoadingFragment().apply {
+            val bundle = Bundle()
+            bundle.putSerializable("httpOptions", builder)
+            arguments = bundle
+        }
     }
 
     fun dismissLoading(activity: Activity?) {
