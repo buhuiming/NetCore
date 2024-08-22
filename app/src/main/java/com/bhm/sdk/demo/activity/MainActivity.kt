@@ -210,8 +210,8 @@ open class MainActivity : HttpActivity() {
             .setLoadingDialog(MyHttpLoadingDialog())
             .setDialogAttribute(
                 isShowDialog = true,
-                cancelable = false,
-                dialogDismissInterruptRequest = false
+                cancelable = true,
+                dialogDismissInterruptRequest = true
             )
             .setIsLogOutPut(false)
             .setHttpLogEvent(object : HttpLogEvent {

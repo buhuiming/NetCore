@@ -9,10 +9,8 @@ import com.bhm.network.base.HttpLoadingFragment
  * Created by bhm on 2022/9/15.
  */
 class MyHttpLoadingDialog : HttpLoadingDialog() {
-    override fun initDialog(builder: HttpOptions?): HttpLoadingFragment {
+    override fun getLoadingFragment(bundle: Bundle): HttpLoadingFragment {
         return MyHttpLoadingFragment().apply {
-            val bundle = Bundle()
-            bundle.putSerializable("httpOptions", builder)
             arguments = bundle
         }
     }

@@ -7,18 +7,20 @@ import com.bhm.network.core.HttpConfig.Companion.httpLoadingDialog
 import com.bhm.network.core.HttpConfig.Companion.writtenLength
 import com.bhm.network.core.callback.CallBackImp
 import com.bhm.network.core.callback.HttpLogEvent
-import com.bhm.network.define.*
+import com.bhm.network.define.CODE_KEY
+import com.bhm.network.define.DATA_KEY
+import com.bhm.network.define.MESSAGE_KEY
+import com.bhm.network.define.OK_CODE
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.ObservableTransformer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.OkHttpClient
-import java.io.Serializable
 
 /**
  * Created by bhm on 2022/9/15.
  */
 @Suppress("unused")
-class HttpOptions(private val builder: Builder) : Serializable {
+class HttpOptions(private val builder: Builder) {
     var currentRequestDateTamp: Long = 0
     val activity: HttpActivity
         get() = builder.activity

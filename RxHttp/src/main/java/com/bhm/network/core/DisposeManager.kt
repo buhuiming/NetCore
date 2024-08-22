@@ -35,7 +35,7 @@ class DisposeManager {
      * 取消一个请求
      */
     fun removeDispose() { //中断监听 取消请求
-        if (null != list && list.isNullOrEmpty()) {
+        if (null != list && list.isNullOrEmpty().not()) {
             mCompositeDisposable.remove(list!![list!!.size - 1])
             list!!.remove(list!![list!!.size - 1])
         }

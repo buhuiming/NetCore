@@ -13,6 +13,14 @@ open class HttpLoadingDialog {
 
     private var showAgain = false
 
+    companion object {
+        const val KEY_DIALOG_CANCELABLE = "key_dialog_cancelable"
+
+        const val KEY_DIALOG_DIALOG_DISMISS_INTERRUPT_REQUEST = "key_dialog_dialogDismissInterruptRequest"
+
+        const val KEY_DIALOG_LOADING_TITLE = "key_dialog_loading_title"
+    }
+
     /**
      * rxManager 用户按返回关闭，请求取消
      * isCancelable true,单击返回键，dialog关闭；false,1s内双击返回键，dialog关闭，否则dialog不关闭
@@ -37,10 +45,18 @@ open class HttpLoadingDialog {
         }
     }
 
-    open fun initDialog(builder: HttpOptions?): HttpLoadingFragment {
+    private fun initDialog(builder: HttpOptions): HttpLoadingFragment {
+        val bundle = Bundle()
+        bundle.putBoolean(KEY_DIALOG_CANCELABLE, builder.isCancelable)
+        bundle.putBoolean(KEY_DIALOG_DIALOG_DISMISS_INTERRUPT_REQUEST, builder.isDialogDismissInterruptRequest)
+        bundle.putString(KEY_DIALOG_LOADING_TITLE, builder.loadingTitle)
+        return getLoadingFragment(bundle).apply {
+            setDisposeManager(builder.disposeManager)
+        }
+    }
+
+    open fun getLoadingFragment(bundle: Bundle): HttpLoadingFragment {
         return HttpLoadingFragment().apply {
-            val bundle = Bundle()
-            bundle.putSerializable("httpOptions", builder)
             arguments = bundle
         }
     }
