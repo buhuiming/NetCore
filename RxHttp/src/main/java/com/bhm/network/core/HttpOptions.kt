@@ -78,6 +78,10 @@ class HttpOptions(private val builder: Builder) {
         get() = builder.parseDataKey
     val noProxy: Boolean
         get() = builder.noProxy
+    val cacheDuration: Long
+        get() = builder.cacheDuration
+    val cacheDurationNoNet: Long
+        get() = builder.cacheDurationNoNet
 
     class Builder(val activity: HttpActivity) {
         internal var disposeManager: DisposeManager? = activity.disposeManager
@@ -105,6 +109,8 @@ class HttpOptions(private val builder: Builder) {
         internal var parseDataKey = HttpConfig.parseDataKey
         internal var noProxy = true
         internal var httpLogEvent = HttpConfig.httpLogEvent
+        internal var cacheDuration: Long = HttpConfig.cacheDuration
+        internal var cacheDurationNoNet: Long = HttpConfig.cacheDurationNoNet
 
         /**
          * 设置请求loading页面
@@ -242,6 +248,16 @@ class HttpOptions(private val builder: Builder) {
          */
         fun setHttpLogEvent(httpLogEvent: HttpLogEvent) = apply {
             this.httpLogEvent = httpLogEvent
+        }
+
+        /**
+         * 设置缓存时间
+         * @param cacheDuration 有网络时缓存时间，单位秒
+         * @param cacheDurationNoNet 没有网络时缓存时间，单位秒
+         */
+        fun setCacheDuration(cacheDuration: Long, cacheDurationNoNet: Long) = apply {
+            this.cacheDuration = cacheDuration
+            this.cacheDurationNoNet = cacheDurationNoNet
         }
 
         fun build(): HttpOptions {

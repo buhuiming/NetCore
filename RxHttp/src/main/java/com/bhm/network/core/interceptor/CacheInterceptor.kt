@@ -24,7 +24,7 @@ class CacheInterceptor {
             var request = chain.request()
             if (isNetworkConnected(builder.activity)) {
                 // 有网络时, 缓存5s，根据实际情况设置
-                val maxAge = 5
+                val maxAge = builder.cacheDuration
                 request = request.newBuilder()
                     .removeHeader(USER_AGENT)
                     .removeHeader(ACCEPT_ENCODING)
@@ -40,7 +40,7 @@ class CacheInterceptor {
                     .build()
             } else {
                 // 无网络时，缓存为3天
-                val maxStale = 60 * 60 * 24 * 3
+                val maxStale = builder.cacheDurationNoNet
                 request = request.newBuilder()
                     .cacheControl(CacheControl.FORCE_CACHE)
                     .removeHeader(USER_AGENT)

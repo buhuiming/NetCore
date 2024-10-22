@@ -38,6 +38,8 @@ class HttpConfig(builder: Builder) {
         internal var successCode: Int = OK_CODE
         internal var parseDataKey: Boolean = false
         internal var httpLogEvent: HttpLogEvent? = null
+        internal var cacheDuration: Long = 5L
+        internal var cacheDurationNoNet: Long = 60 * 60 * 24 * 3L
 
         /**
          * 设置请求loading页面
@@ -170,6 +172,16 @@ class HttpConfig(builder: Builder) {
             this.httpLogEvent = httpLogEvent
         }
 
+        /**
+         * 设置缓存时间
+         * @param cacheDuration 有网络时缓存时间，单位秒
+         * @param cacheDurationNoNet 没有网络时缓存时间，单位秒
+         */
+        fun setCacheDuration(cacheDuration: Long, cacheDurationNoNet: Long) = apply {
+            this.cacheDuration = cacheDuration
+            this.cacheDurationNoNet = cacheDurationNoNet
+        }
+
         fun build(): HttpConfig {
             return HttpConfig(this)
         }
@@ -251,6 +263,14 @@ class HttpConfig(builder: Builder) {
             private set
 
         @JvmStatic
+        var cacheDuration: Long = 5L //缓存时间，单位秒，有网络时缓存时间，默认5秒
+            private set
+
+        @JvmStatic
+        var cacheDurationNoNet: Long = 60 * 60 * 24 * 3L //缓存时间，单位秒，没有网络时缓存时间，默认3天
+            private set
+
+        @JvmStatic
         fun create() = Builder()
 
         @JvmStatic
@@ -288,5 +308,7 @@ class HttpConfig(builder: Builder) {
         successCode = builder.successCode
         parseDataKey = builder.parseDataKey
         httpLogEvent = builder.httpLogEvent
+        cacheDuration = builder.cacheDuration
+        cacheDurationNoNet = builder.cacheDurationNoNet
     }
 }
