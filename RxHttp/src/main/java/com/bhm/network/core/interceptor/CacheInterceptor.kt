@@ -36,7 +36,7 @@ class CacheInterceptor {
                 response.newBuilder()
                     .removeHeader("Pragma")
                     .removeHeader(CACHE_CONTROL)
-                    .header(CACHE_CONTROL, "public, max-age=$maxAge")
+                    .header(CACHE_CONTROL, if (maxAge < 0L) "no-cache" else "public, max-age=$maxAge")
                     .build()
             } else {
                 // 无网络时，缓存为3天
