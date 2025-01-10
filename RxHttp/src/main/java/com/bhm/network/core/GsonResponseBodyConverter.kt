@@ -36,12 +36,24 @@ class GsonResponseBodyConverter<T> internal constructor(
                         gson.fromJson(response, type)
                     }
                 } catch (e: Exception) {
-                    if (dataArr != null && "[]" == dataArr.toString()) {
-                        //这种情况是一个空数组，但是声明的却不是一个数组
-                        jsonObject.put(dataKey, null)
-                        gson.fromJson<T>(jsonObject.toString(), type)
-                    } else {
-                        throw ResultException(code, code, message, response)
+                    when {
+                        dataArr != null && "[]" == dataArr.toString() -> {
+                            //这种情况是一个空数组，但是声明的却不是一个数组
+                            jsonObject.put(dataKey, null)
+                            gson.fromJson(jsonObject.toString(), type)
+                        }
+                        dataArr != null && dataArr.length() > 0 -> {
+                            //这种情况是一个非空数组
+                            try {
+                                @Suppress("UNCHECKED_CAST")
+                                gson.fromJson<List<*>>(dataArr.toString(), type) as T
+                            } catch (e: Exception) {
+                                throw ResultException(code, code, message, response)
+                            }
+                        }
+                        else -> {
+                            throw ResultException(code, code, message, response)
+                        }
                     }
                 }
             }
