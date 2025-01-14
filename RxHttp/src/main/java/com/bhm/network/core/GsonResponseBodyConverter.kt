@@ -37,13 +37,9 @@ class GsonResponseBodyConverter<T> internal constructor(
                     }
                 } catch (e: Exception) {
                     when {
-                        dataArr != null && "[]" == dataArr.toString() -> {
+                        dataArr != null && "[]" == dataArr.toString() ||
+                                dataArr != null && dataArr.length() > 0 -> {
                             //这种情况是一个空数组，但是声明的却不是一个数组
-                            jsonObject.put(dataKey, null)
-                            gson.fromJson(jsonObject.toString(), type)
-                        }
-                        dataArr != null && dataArr.length() > 0 -> {
-                            //这种情况是一个非空数组
                             try {
                                 @Suppress("UNCHECKED_CAST")
                                 gson.fromJson<List<*>>(dataArr.toString(), type) as T

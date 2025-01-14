@@ -10,7 +10,7 @@
         }
 
         dependencies {
-            implementation 'com.github.buhuiming:NetCore:1.6.7'
+            implementation 'com.github.buhuiming:NetCore:1.6.9'
         }
 
 #### 1、Activity继承HttpActivity，Fragment继承HttpFragment，DialogFragment继承HttpDialogFragment (实现内存管理)
